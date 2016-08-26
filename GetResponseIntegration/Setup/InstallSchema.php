@@ -326,6 +326,21 @@ class InstallSchema implements InstallSchemaInterface
             );
         $installer->getConnection()->createTable($table);
 
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $stores = $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStores();
+        foreach ($stores as $store) {
+            $columns = ['id', 'id_shop', 'custom_field', 'custom_value', 'custom_name', 'default', 'active_custom'];
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [1, $store->getId(), 'firstname', 'firstname', 'firstname', 1, 1]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [2, $store->getId(), 'lastname', 'lastname', 'lastname', 1, 1]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [3, $store->getId(), 'email', 'email', 'email', 1, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [4, $store->getId(), 'street', 'street', 'magento_street', 0, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [9, $store->getId(), 'birthday', 'birthday', 'magento_birthday', 0, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [5, $store->getId(), 'postcode', 'postcode', 'magento_postcode', 0, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [6, $store->getId(), 'city', 'city', 'magento_city', 0, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [7, $store->getId(), 'telephone', 'telephone', 'magento_phone', 0, 0]);
+            $installer->getConnection()->insertArray('getresponse_customs', $columns, [8, $store->getId(), 'country', 'country', 'magento_country', 0, 0]);
+        }
+
         $installer->endSetup();
     }
 }
