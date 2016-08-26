@@ -326,19 +326,19 @@ class InstallSchema implements InstallSchemaInterface
             );
         $installer->getConnection()->createTable($table);
 
+        $installer->getConnection()->delete($installer->getTable('getresponse_customs'));
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $stores = $objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStores();
         foreach ($stores as $store) {
-            $columns = ['id', 'id_shop', 'custom_field', 'custom_value', 'custom_name', 'default', 'active_custom'];
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [1, $store->getId(), 'firstname', 'firstname', 'firstname', 1, 1]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [2, $store->getId(), 'lastname', 'lastname', 'lastname', 1, 1]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [3, $store->getId(), 'email', 'email', 'email', 1, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [4, $store->getId(), 'street', 'street', 'magento_street', 0, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [9, $store->getId(), 'birthday', 'birthday', 'magento_birthday', 0, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [5, $store->getId(), 'postcode', 'postcode', 'magento_postcode', 0, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [6, $store->getId(), 'city', 'city', 'magento_city', 0, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [7, $store->getId(), 'telephone', 'telephone', 'magento_phone', 0, 0]);
-            $installer->getConnection()->insertArray('getresponse_customs', $columns, [8, $store->getId(), 'country', 'country', 'magento_country', 0, 0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>1, 'id_shop'=>$store->getId(), 'custom_field'=>'firstname', 'custom_value'=>'firstname', 'custom_name'=>'firstname', 'default'=>1, 'active_custom'=>1]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>2, 'id_shop'=>$store->getId(), 'custom_field'=>'lastname', 'custom_value'=>'lastname', 'custom_name'=>'lastname', 'default'=>1, 'active_custom'=>1]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>3, 'id_shop'=>$store->getId(), 'custom_field'=>'email', 'custom_value'=>'email', 'custom_name'=>'email', 'default'=>1, 'active_custom'=>1]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>4, 'id_shop'=>$store->getId(), 'custom_field'=>'street', 'custom_value'=>'street', 'custom_name'=>'magento_street', 'default'=>0, 'active_custom'=>0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>5, 'id_shop'=>$store->getId(), 'custom_field'=>'postcode', 'custom_value'=>'postcode', 'custom_name'=>'magento_postcode', 'default'=>0, 'active_custom'=>0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>6, 'id_shop'=>$store->getId(), 'custom_field'=>'city', 'custom_value'=>'city', 'custom_name'=>'magento_city', 'default'=>0, 'active_custom'=>0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>7, 'id_shop'=>$store->getId(), 'custom_field'=>'telephone', 'custom_value'=>'telephone', 'custom_name'=>'magento_telephone', 'default'=>0, 'active_custom'=>0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>8, 'id_shop'=>$store->getId(), 'custom_field'=>'country', 'custom_value'=>'country', 'custom_name'=>'magento_country', 'default'=>0, 'active_custom'=>0]);
+            $installer->getConnection()->insertMultiple($installer->getTable('getresponse_customs'), ['id'=>9, 'id_shop'=>$store->getId(), 'custom_field'=>'birthday', 'custom_value'=>'birthday', 'custom_name'=>'magento_birthday', 'default'=>0, 'active_custom'=>0]);
         }
 
         $installer->endSetup();
