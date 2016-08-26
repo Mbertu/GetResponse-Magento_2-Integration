@@ -28,7 +28,7 @@ class Index extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-        $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+        $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
         return $resultPage;
     }

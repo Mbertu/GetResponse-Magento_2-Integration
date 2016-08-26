@@ -26,7 +26,7 @@ class Index extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('GetResponse integration settings');
+        $resultPage->getConfig()->getTitle()->prepend('GetResponse Account');
 
         return $resultPage;
     }

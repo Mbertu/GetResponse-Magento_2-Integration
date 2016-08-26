@@ -28,7 +28,7 @@ class Webform extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('Subscribe via Web Form');
+        $resultPage->getConfig()->getTitle()->prepend('Subscribe via a form');
 
         return $resultPage;
     }

@@ -28,7 +28,7 @@ class Automation extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('Automation settings');
+        $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
 
         return $resultPage;
     }

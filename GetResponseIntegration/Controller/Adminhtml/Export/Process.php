@@ -36,7 +36,7 @@ class Process extends \Magento\Backend\App\Action
             $this->messageManager->addError('You need to choose a campaign!');
             $resultPage = $this->resultPageFactory->create();
             $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-            $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+            $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
             return $resultPage;
         }
@@ -50,7 +50,7 @@ class Process extends \Magento\Backend\App\Action
                     must be composed using up to 32 characters, only a-z (lower case), numbers and "_".');
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-                    $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+                    $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
                     return $resultPage;
                 }
@@ -95,7 +95,7 @@ class Process extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-        $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+        $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
         return $resultPage;
     }

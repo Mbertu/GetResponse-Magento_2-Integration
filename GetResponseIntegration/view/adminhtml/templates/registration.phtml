@@ -13,11 +13,9 @@ $autoresponders = $block->getAutoresponders();
 
 <div>
     <p>
-        With this feature you can add subscribers to a selected GetResponse campaign once they register to your online
-        shop via the registration page. Select the target campaign or create a new campaign for your Magento
-        subscribers. If the campaign includes an autoresponder, choose the sequence day you want to export the
-        contacts to. In case a customer might change her/his contact data in the last stage of order placement,
-        check the Checkout Update box and GetResponse will update the information automatically.
+        You can add subscribers to a specific GetResponse campaign when people register to your online shop (using the
+        registration page). Select an existing campaign or create a new one for your visitors. Select if you want to
+        update specific fields. When this option is off only new contacts are exported.
     </p>
 </div>
 
@@ -59,14 +57,22 @@ $autoresponders = $block->getAutoresponders();
         <table class="config admin__scope-old">
             <tbody>
             <tr>
-                <td class="label" style="width:200px;">
-                    <label for="enabled" style="margin-top: 7px;">On/Off</label>
+                <td class="label" style="width:330px;">
+                    <label for="enabled" style="margin-top: 7px;">Allow subscriptions when customers register</label>
                 </td>
                 <td class="value">
-                    <select name="enabled" id="enabled">
-                        <option value="0">Off</option>
-                        <option value="1"<?php if ($settings['active_subscription'] == true): ?> selected="selected"<?php endif; ?>>On</option>
-                    </select>
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="enabled"
+                        id="enabled"
+                        value="1"
+                        <?php
+                        if (isset($settings['active_subscription']) && $settings['active_subscription'] == true) {
+                            echo ' checked="checked"';
+                        }
+                        ?>
+                    />
                     <p class="note">
                     <span>
                         Turn subscription via registration page on or off.
@@ -77,7 +83,7 @@ $autoresponders = $block->getAutoresponders();
 
             <tr>
                 <td class="label">
-                    <label for="campaign_id" style="margin-top: 7px;">Campaign</label>
+                    <label for="campaign_id" style="margin-top: 7px;">Select your campaign</label>
                 </td>
                 <td class="value">
                     <select name="campaign_id" id="campaign_id">
@@ -109,9 +115,25 @@ $autoresponders = $block->getAutoresponders();
 
             <?php include 'new_campaign.phtml'; ?>
 
+            <tr class="cycle_day">
+                <td class="label" style="width: 200px;">
+                    <label for="cycle_day" style="margin-top: 7px;">Autoresponder sequence</label>
+                </td>
+                <td class="value">
+                    <select name="cycle_day" id="cycle_day">
+                        <option value="">Choose cycle day</option>
+                    </select>
+                    <p class="note">
+                    <span>
+                        Please select autoresponder cycle day.
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
             <tr>
                 <td class="label">
-                    <label for="gr_sync_order_data">Update custom fields</label>
+                    <label for="gr_sync_order_data">Update contact details</label>
                 </td>
                 <td class="value">
                     <input
@@ -163,48 +185,7 @@ $autoresponders = $block->getAutoresponders();
                     </div>
                     <p class="note">
                     <span>
-                        Choose custom fields you want to update.<br />Custom name must be composed using up to 32 characters, only a-z (lower case), numbers and "_".
-                    </span>
-                    </p>
-                </td>
-            </tr>
-
-            <tr>
-                <td class="label">
-                    <label for="gr_autoresponder">Autoresponder sequence</label>
-                </td>
-                <td class="value">
-                    <input
-                        class="GR_checkbox"
-                        type="checkbox"
-                        name="gr_autoresponder"
-                        id="gr_autoresponder"
-                        value="1"
-                        <?php
-                        if (isset($settings['cycle_day']) && $settings['cycle_day'] != '') {
-                            echo ' checked="checked"';
-                        }
-                        ?>
-                    />
-                    <p class="note">
-                    <span>
-                        Select if you want to add customers to autoresponder sequence.
-                    </span>
-                    </p>
-                </td>
-            </tr>
-
-            <tr class="cycle_day" style="display:none;">
-                <td class="label" style="width: 200px;">
-                    <label for="cycle_day" style="margin-top: 7px;">Day of cycle</label>
-                </td>
-                <td class="value">
-                    <select name="cycle_day" id="cycle_day">
-                        <option value="">Choose cycle day</option>
-                    </select>
-                    <p class="note">
-                    <span>
-                        Please select autoresponder cycle day.
+                        Copy Magento customer details to custom fields.<br />Custom name must be composed using up to 32 characters, only a-z (lower case), numbers and "_".
                     </span>
                     </p>
                 </td>
@@ -221,7 +202,7 @@ $autoresponders = $block->getAutoresponders();
 
 <script>
     var sod = jQuery('#gr_sync_order_data'), forms = jQuery('.forms');
-    var cycle_day_checkbox = jQuery('#gr_autoresponder'), campaign_id = jQuery('#campaign_id'), cycle_day = jQuery('#cycle_day');
+    var campaign_id = jQuery('#campaign_id'), cycle_day = jQuery('#cycle_day');
     if (sod.prop('checked') == true) {
         forms.show();
     }
@@ -231,13 +212,6 @@ $autoresponders = $block->getAutoresponders();
     jQuery('.jsNarrowSelect').selectNarrowDown();
 
     var autoresponders = <?php echo json_encode($autoresponders); ?>;
-
-    if (cycle_day_checkbox.prop('checked') == true) {
-        jQuery('.cycle_day').show();
-    }
-    cycle_day_checkbox.change(function () {
-        jQuery('.cycle_day').toggle('slow');
-    });
 
     function populateSelectWithAutoresponders() {
         cycle_day.empty();
@@ -250,17 +224,15 @@ $autoresponders = $block->getAutoresponders();
                     + campaign_autoresponders[i]['name']
                     + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
             }
+            cycle_day.prop('disabled', false);
         } else {
             options = '<option value="">No autoresponders for chosen campaign!</option>';
+            cycle_day.prop('disabled', true);
         }
         cycle_day.append(options);
     }
 
     populateSelectWithAutoresponders();
-    var selected_cycle_day = <?php echo ($settings['cycle_day'] == '') ? 'false' : $settings['cycle_day']; ?>;
-    if (false != selected_cycle_day) {
-        cycle_day.val(selected_cycle_day);
-    }
 
     campaign_id.change(function() {
         populateSelectWithAutoresponders();

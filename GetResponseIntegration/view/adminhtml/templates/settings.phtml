@@ -31,9 +31,7 @@ $isApiActive = $block->checkApiKey();
     }
 </style>
 <?php if (!$isApiActive) { ?>
-    <p>
-        Enter your API key. You can find it on your GetResponse profile in
-    <a href="https://app.getresponse.com/manage_api.html">Account Details -> GetResponse API.</a></p>
+    <h2>Connect GetResponse Account</h2>
 <?php } ?>
 <div class="accordion">
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/save'); ?>">
@@ -45,7 +43,7 @@ $isApiActive = $block->checkApiKey();
                 <tr>
                     <td class="label">
                         <label for="getresponse_api_key" style="padding-top:0px;">
-                            API key
+                            API Key
                         </label>
                     </td>
                     <td class="value">
@@ -54,8 +52,8 @@ $isApiActive = $block->checkApiKey();
                                class="input-text admin__control-text">
                         <p class="note">
                             <span>
-                                If you already are a GetResponse customer, please enter your API key to enable
-                                the module and click "Save" to continue.
+                                Enter your API key. You can find it on your GetResponse profile in
+                                <a href="https://app.getresponse.com/manage_api.html" target="_blank">Account Details -> API & oAuth.</a>
                             </span>
                         </p>
                     </td>
@@ -66,17 +64,12 @@ $isApiActive = $block->checkApiKey();
                         <label for="getresponse_getresponseintegration_general_api_key">Status</label>
                     </td>
                     <td class="value">
-                        <div style="background: #43C03A; color: white; padding: 5px 10px;" >CONNECTED</div>
-                        <p class="note">
-                            <span>
-                                You are connected to GetResponse account. (<a href="<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>">Disconnect</a>)
-                            </span>
-                        </p>
+                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>">disconnect</a>)</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="label">
-                        API key
+                        API Key
                     </td>
                     <td class="value">
                         <span name="getresponse_api_key" id="getresponse_api_key"><?php echo $block->getApiKey(); ?></span>
@@ -120,7 +113,7 @@ $isApiActive = $block->checkApiKey();
     <?php if (!$isApiActive) : ?>
     <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
         <span class="ui-button-text">
-            <span>Save</span>
+            <span>Connect</span>
         </span>
     </button>
     <?php endif; ?>

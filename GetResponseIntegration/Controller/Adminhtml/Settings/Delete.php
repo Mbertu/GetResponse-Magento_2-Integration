@@ -42,12 +42,12 @@ class Delete extends \Magento\Backend\App\Action
                 $automation->delete();
             }
 
-            $this->messageManager->addSuccess('Successfully disconnected!');
+            $this->messageManager->addSuccess('You disconnected your Magento from GetResponse.');
         }
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('GetResponse integration settings');
+        $resultPage->getConfig()->getTitle()->prepend('GetResponse Account');
 
         return $resultPage;
     }

@@ -50,18 +50,18 @@ class Save extends \Magento\Backend\App\Action
                         ->setCountryCode($response->countryCode->countryCode)
                         ->save();
 
-                    $this->messageManager->addSuccess('Your API key has been saved!');
+                    $this->messageManager->addSuccess('You connected your Magento to GetResponse.');
                 } else {
-                    $this->messageManager->addError('Invalid API key!');
+                    $this->messageManager->addError('The API key seems incorrect. Please check if you typed or pasted it correctly. If you recently generated a new key, please make sure you’re using the right one.');
                 }
             } else {
-                $this->messageManager->addError('API key can not be empty!');
+                $this->messageManager->addError('The API key seems incorrect. Please check if you typed or pasted it correctly. If you recently generated a new key, please make sure you’re using the right one.');
             }
         }
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('GetResponse integration settings');
+        $resultPage->getConfig()->getTitle()->prepend('GetResponse Account');
 
         return $resultPage;
     }

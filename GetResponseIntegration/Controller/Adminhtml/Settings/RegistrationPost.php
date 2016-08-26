@@ -61,7 +61,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
                 $this->updateCustoms($customs);
             }
 
-            $this->messageManager->addSuccess('Your settings have been updated!');
+            $this->messageManager->addSuccess('Subscription settings successfully saved.');
         }
 
         $resultPage = $this->resultPageFactory->create();

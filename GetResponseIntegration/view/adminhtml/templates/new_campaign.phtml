@@ -8,7 +8,7 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
 <style>
     .campaign_value {
         /*border: 8px solid #EB5202;*/
-        padding-left: 40px;
+        padding-left: 0px;
     }
 </style>
 <tr class="add_campaign_row" style="display:none;">
@@ -16,10 +16,15 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         <label for="gr_sync_order_data"></label>
     </td>
     <td class="value campaign_value">
+        <p class="note">
+            <span style="font-weight: bold;">
+                Campaign name
+            </span>
+        </p>
         <input type="text" name="campaign_name" id="campaign_name" style="width: 500px;" />
         <p class="note">
             <span>
-                Campaign name must be between 3-64 characters, only a-z (lower case), numbers and "_"
+                Must be between 3-64 characters, only a-z (lower case), numbers and "_"
             </span>
         </p>
     </td>
@@ -30,6 +35,11 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         <label for="gr_sync_order_data"></label>
     </td>
     <td class="value campaign_value">
+        <p class="note">
+            <span style="font-weight: bold;">
+                From field
+            </span>
+        </p>
         <select name="from_field" id="from_field" style="width: 500px;">
             <?php
             if (isset($from_fields)) {
@@ -39,11 +49,6 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
             }
             ?>
         </select>
-        <p class="note">
-            <span>
-                Select From field for new campaign
-            </span>
-        </p>
     </td>
 </tr>
 
@@ -52,6 +57,11 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         <label for="gr_sync_order_data"></label>
     </td>
     <td class="value campaign_value">
+        <p class="note">
+            <span style="font-weight: bold;">
+                Reply-To
+            </span>
+        </p>
         <select name="reply_to_field" id="reply_to_field" style="width: 500px;">
             <?php
             if (isset($from_fields)) {
@@ -61,11 +71,6 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
             }
             ?>
         </select>
-        <p class="note">
-            <span>
-                Select Reply-To field for new campaign
-            </span>
-        </p>
     </td>
 </tr>
 
@@ -74,6 +79,11 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         <label for="confirmation_subject"></label>
     </td>
     <td class="value campaign_value">
+        <p class="note">
+            <span style="font-weight: bold;">
+                Confirmation subject
+            </span>
+        </p>
         <select name="confirmation_subject" id="confirmation_subject" style="width: 500px;">
             <?php
             if (isset($confirmation_subjects)) {
@@ -83,11 +93,6 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
             }
             ?>
         </select>
-        <p class="note">
-            <span>
-                Confirmation subject
-            </span>
-        </p>
     </td>
 </tr>
 
@@ -96,6 +101,11 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         <label for="confirmation_body"></label>
     </td>
     <td class="value campaign_value">
+        <p class="note">
+            <span style="font-weight: bold;">
+                Confirmation body
+            </span>
+        </p>
         <select name="confirmation_body" id="confirmation_body" style="width: 500px;" class="gr_select hiddenselect fullSelectHide">
             <?php
             if (isset($confirmation_bodies)) {
@@ -107,7 +117,7 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
         </select>
         <p class="note">
             <span>
-                Confirmation body
+                The confirmation message body and subject depend on System >> Configuration >> General >> Locale Options.
             </span>
         </p>
     </td>
@@ -120,7 +130,7 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
     <td class="value campaign_value">
         <button id="create_campaign" title="Create new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
             <span class="ui-button-text">
-                <span>Create new campaign</span>
+                <span>Create campaign</span>
             </span>
         </button>
         <span id="gr_spinner" style="display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>

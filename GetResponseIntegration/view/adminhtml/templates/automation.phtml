@@ -11,13 +11,21 @@ $autoresponders = $block->getAutoresponders();
 $automations = $block->getAutomations()->getData();
 
 ?>
+<?php if (!is_array($categories) || count($categories) == 0) { ?>
+    <div class="message message-error error">
+        <div data-ui-id="messages-message-error">
+            You have no categories in your store. Please create category to set campaign rules.
+        </div>
+    </div>
+    <br/>
+<?php } ?>
 
 <div>
     <p>
-        GetResponse enables you to automatically move or copy your customers between GetResponse campaigns once they
-        purchase in a particular Magento product category. To do this, click “Create new” button and choose
-        automation parameters. When you select "move" option, the rule will move contacts from ALL existing campaigns
-        to the destination campaign. To add contacts to another campaign simply choose "copy" option.
+        You to automatically move or copy your customers between your GetResponse campaigns when people purchase in
+        a particular Magento product category. To do this, click “Create a new rule” button. When you select
+        "move" option, the rule moves contacts from ALL existing campaigns to the destination campaign.
+        To add contacts to another campaign choose "copy" option.
     </p>
 </div>
 
@@ -54,6 +62,7 @@ $automations = $block->getAutomations()->getData();
     }
 </style>
 
+<?php if (is_array($categories) && count($categories) > 0) { ?>
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
     <?php echo $block->getBlockHtml('formkey'); ?>
     <table class="config admin__scope-old">
@@ -158,13 +167,14 @@ $automations = $block->getAutomations()->getData();
     </table>
     <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
         <span class="ui-button-text">
-            <span>Create new automation</span>
+            <span>Create new rule</span>
         </span>
     </button>
 </form>
-
+<?php } ?>
 
 <div id="automations-table" class="admin__data-grid-wrap" data-role="grid-wrapper">
+    <?php if (!empty($automations)) { ?>
     <table class="data-grid data-grid-draggable" data-role="grid">
         <thead>
         <tr>
@@ -181,11 +191,11 @@ $automations = $block->getAutomations()->getData();
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Action</span>
+                <span class="data-grid-cell-content" data-bind="text: label">Cycle Day</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Cycle Day</span>
+                <span class="data-grid-cell-content" data-bind="text: label">Action</span>
             </th>
 
             <th class="data-grid-th">
@@ -199,7 +209,6 @@ $automations = $block->getAutomations()->getData();
         </thead>
         <tbody>
         <?php
-        if (!empty($automations)) {
             foreach ($automations as $automation) {
                 echo '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' . $automation['id'] . '">';
                 echo '<td style="text-align:center;" class="id">';
@@ -214,12 +223,12 @@ $automations = $block->getAutomations()->getData();
                 echo $block->getCampaign($automation['campaign_id'])->name;
                 echo '</td>';
 
-                echo '<td class="action">';
-                echo $automation['action'];
-                echo '</td>';
-
                 echo '<td class="cycle_day_edit">';
                 echo ($automation['cycle_day'] == '') ? 'Not set' : $automation['cycle_day'];
+                echo '</td>';
+
+                echo '<td class="action">';
+                echo $automation['action'];
                 echo '</td>';
                 ?>
                 <td>
@@ -251,13 +260,11 @@ $automations = $block->getAutomations()->getData();
                 <?php
                 echo '</tr>';
             }
-        }
         ?>
         </tbody>
     </table>
+    <?php } ?>
 </div>
-
-
 
 <form id="edit_automation" method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="display:none;">
     <?php echo $block->getBlockHtml('formkey'); ?>

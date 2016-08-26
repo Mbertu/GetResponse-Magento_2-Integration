@@ -66,10 +66,10 @@ class AutomationPost extends \Magento\Backend\App\Action
                     ->setAction($action)
                     ->save();
 
-                $this->messageManager->addSuccess('Automation settings have been changed');
+                $this->messageManager->addSuccess('Campaign rules have been changed');
                 $resultPage = $this->resultPageFactory->create();
                 $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Automation settings');
+                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
 
                 return $resultPage;
             }
@@ -78,7 +78,7 @@ class AutomationPost extends \Magento\Backend\App\Action
                 $this->messageManager->addError('You need to choose a campaign and category!');
                 $resultPage = $this->resultPageFactory->create();
                 $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Automation settings');
+                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
 
                 return $resultPage;
             }
@@ -93,7 +93,7 @@ class AutomationPost extends \Magento\Backend\App\Action
                 $this->messageManager->addError('Automation has not been created. Rule for chosen category already exist.');
                 $resultPage = $this->resultPageFactory->create();
                 $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Automation settings');
+                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
 
                 return $resultPage;
             }
@@ -111,7 +111,7 @@ class AutomationPost extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('Automation settings');
+        $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
 
         return $resultPage;
     }

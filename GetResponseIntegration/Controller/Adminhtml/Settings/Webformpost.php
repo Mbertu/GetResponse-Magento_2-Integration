@@ -36,12 +36,12 @@ class Webformpost extends \Magento\Backend\App\Action
                 ->setSidebar($sidebar)
                 ->save();
 
-            $this->messageManager->addSuccess('Your settings have been updated!');
+            $this->messageManager->addSuccess('Subscription settings successfully saved.');
         }
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('Subscribe via Web Form');
+        $resultPage->getConfig()->getTitle()->prepend('Subscribe via a form');
 
         return $resultPage;
     }
