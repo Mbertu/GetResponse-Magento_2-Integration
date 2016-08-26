@@ -1,0 +1,128 @@
+<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Settings */?>
+<?php
+$isApiActive = $block->checkApiKey();
+?>
+<style>
+    .label {
+        font-weight: bold;
+    }
+
+    .label label {
+        margin-top: 7px;
+        display: inline-block;
+    }
+
+    .value input {
+        width: 100%;
+    }
+
+    .note {
+        color: #303030;
+        font-size: 12px;
+        margin: 5px 0;
+    }
+
+    .accordion table {
+        width: auto !important;
+    }
+
+    .accordion table tr td {
+        width: auto !important;
+    }
+</style>
+<?php if (!$isApiActive) { ?>
+    <p>
+        Enter your API key. You can find it on your GetResponse profile in
+    <a href="https://app.getresponse.com/manage_api.html">Account Details -> GetResponse API.</a></p>
+<?php } ?>
+<div class="accordion">
+<form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/save'); ?>">
+    <?php echo $block->getBlockHtml('formkey'); ?>
+    <div class="config admin__scope-old">
+    <table>
+        <tbody>
+            <?php if (!$isApiActive) : ?>
+                <tr>
+                    <td class="label">
+                        <label for="getresponse_api_key" style="padding-top:0px;">
+                            API key
+                        </label>
+                    </td>
+                    <td class="value">
+                        <input type="text" name="getresponse_api_key" id="getresponse_api_key"
+                               value="<?php echo $block->getLastPostedApiKey(); ?>"
+                               class="input-text admin__control-text">
+                        <p class="note">
+                            <span>
+                                If you already are a GetResponse customer, please enter your API key to enable
+                                the module and click "Save" to continue.
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+            <?php else : ?>
+                <tr>
+                    <td class="label">
+                        <label for="getresponse_getresponseintegration_general_api_key">Status</label>
+                    </td>
+                    <td class="value">
+                        <div style="background: #43C03A; color: white; padding: 5px 10px;" >CONNECTED</div>
+                        <p class="note">
+                            <span>
+                                You are connected to GetResponse account. (<a href="<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>">Disconnect</a>)
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="label">
+                        API key
+                    </td>
+                    <td class="value">
+                        <span name="getresponse_api_key" id="getresponse_api_key"><?php echo $block->getApiKey(); ?></span>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        <?php
+        if ($isApiActive) :
+            $account = $block->getAccountInfo();
+        ?>
+            <tr>
+                <td class="label">Name</td>
+                <td class="value"><?php echo $account->getFirstName() . ' ' . $account->getLastName(); ?></td>
+            </tr>
+
+            <tr>
+                <td class="label">Email</td>
+                <td class="value"><?php echo $account->getEmail(); ?></td>
+            </tr>
+            <?php if (!empty($account->getCompanyName())) : ?>
+                <tr>
+                    <td class="label">Company</td>
+                    <td class="value"><?php echo $account->getCompanyName(); ?></td>
+                </tr>
+            <?php endif; ?>
+            <tr>
+                <td class="label">Phone</td>
+                <td class="value"><?php echo $account->getPhone(); ?></td>
+            </tr>
+
+            <tr>
+                <td class="label">Address</td>
+                <td class="value"><?php echo $account->getStreet() . '<br />' . $account->getZipCode() . ' ' . $account->getCity() . '<br />' . $account->getState() . '<br />' . $account->getCountryCode(); ?></td>
+            </tr>
+        <?php
+        endif;
+        ?>
+        </tbody>
+    </table>
+    </div>
+    <?php if (!$isApiActive) : ?>
+    <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+        <span class="ui-button-text">
+            <span>Save</span>
+        </span>
+    </button>
+    <?php endif; ?>
+</form>
+</div>

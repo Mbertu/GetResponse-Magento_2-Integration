@@ -1,0 +1,200 @@
+<?php
+$from_fields = $block->getAccountFromFields();
+$lang = substr($block->getStoreLanguage(), 0, 2);
+$confirmation_subjects = $block->getSubscriptionConfirmationsSubject($lang);
+$confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
+?>
+
+<style>
+    .campaign_value {
+        /*border: 8px solid #EB5202;*/
+        padding-left: 40px;
+    }
+</style>
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+        <label for="gr_sync_order_data"></label>
+    </td>
+    <td class="value campaign_value">
+        <input type="text" name="campaign_name" id="campaign_name" style="width: 500px;" />
+        <p class="note">
+            <span>
+                Campaign name must be between 3-64 characters, only a-z (lower case), numbers and "_"
+            </span>
+        </p>
+    </td>
+</tr>
+
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+        <label for="gr_sync_order_data"></label>
+    </td>
+    <td class="value campaign_value">
+        <select name="from_field" id="from_field" style="width: 500px;">
+            <?php
+            if (isset($from_fields)) {
+                foreach ($from_fields as $from_field) {
+                    echo '<option value="' . $from_field->fromFieldId . '">' . $from_field->name . ' (' . $from_field->email . ')</option>';
+                }
+            }
+            ?>
+        </select>
+        <p class="note">
+            <span>
+                Select From field for new campaign
+            </span>
+        </p>
+    </td>
+</tr>
+
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+        <label for="gr_sync_order_data"></label>
+    </td>
+    <td class="value campaign_value">
+        <select name="reply_to_field" id="reply_to_field" style="width: 500px;">
+            <?php
+            if (isset($from_fields)) {
+                foreach ($from_fields as $from_field) {
+                    echo '<option value="' . $from_field->fromFieldId . '">' . $from_field->name . ' (' . $from_field->email . ')</option>';
+                }
+            }
+            ?>
+        </select>
+        <p class="note">
+            <span>
+                Select Reply-To field for new campaign
+            </span>
+        </p>
+    </td>
+</tr>
+
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+        <label for="confirmation_subject"></label>
+    </td>
+    <td class="value campaign_value">
+        <select name="confirmation_subject" id="confirmation_subject" style="width: 500px;">
+            <?php
+            if (isset($confirmation_subjects)) {
+                foreach ($confirmation_subjects as $subject) {
+                    echo '<option value="' . $subject->subscriptionConfirmationSubjectId . '">' . $subject->subject . '</option>';
+                }
+            }
+            ?>
+        </select>
+        <p class="note">
+            <span>
+                Confirmation subject
+            </span>
+        </p>
+    </td>
+</tr>
+
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+        <label for="confirmation_body"></label>
+    </td>
+    <td class="value campaign_value">
+        <select name="confirmation_body" id="confirmation_body" style="width: 500px;" class="gr_select hiddenselect fullSelectHide">
+            <?php
+            if (isset($confirmation_bodies)) {
+                foreach ($confirmation_bodies as $body) {
+                    echo '<option value="' . $body->subscriptionConfirmationBodyId . '">(' . $body->name . ') ' . $body->contentPlain . '</option>';
+                }
+            }
+            ?>
+        </select>
+        <p class="note">
+            <span>
+                Confirmation body
+            </span>
+        </p>
+    </td>
+</tr>
+
+<tr class="add_campaign_row" style="display:none;">
+    <td class="label">
+
+    </td>
+    <td class="value campaign_value">
+        <button id="create_campaign" title="Create new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+            <span class="ui-button-text">
+                <span>Create new campaign</span>
+            </span>
+        </button>
+        <span id="gr_spinner" style="display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+        <p id="new_campaign_message"></p>
+    </td>
+</tr>
+
+<script type="text/javascript">
+var add_campaign_rows = jQuery('.add_campaign_row'), add_campaign_button = jQuery('#new_campaign_button'), create_campaign_button = jQuery('#create_campaign');
+
+add_campaign_button.on('click', function() {
+    if (jQuery('.add_campaign_row').is(':visible')) {
+        jQuery('#new_campaign_button>span').text('Add new campaign');
+    } else {
+        jQuery('#campaign_name').val('');
+        jQuery('#new_campaign_message').html('');
+        jQuery('#new_campaign_button>span').text('Hide new campaign');
+    }
+    add_campaign_rows.toggle('slow');
+});
+
+var url = '<?php echo $block->getUrl('getresponseintegration/settings/createcampaign'); ?>?isAjax=true';
+
+create_campaign_button.on('click', function(e) {
+    e.preventDefault();
+
+    var regex = /^[a-z0-9_]{3,64}$/;
+    var campaign_name = jQuery('#campaign_name').val();
+    if(regex.test(campaign_name)) {
+        jQuery.ajax({
+            type: "POST",
+            url: url,
+            data: {
+                form_key: FORM_KEY,
+                campaign_name: campaign_name,
+                from_field: jQuery('#from_field').val(),
+                reply_to_field: jQuery('#reply_to_field').val(),
+                confirmation_subject: jQuery('#confirmation_subject').val(),
+                confirmation_body: jQuery('#confirmation_body').val()
+            },
+            beforeSend: function () {
+                jQuery('#new_campaign_message').html('');
+                jQuery("#gr_spinner").show();
+                create_campaign_button.prop('disabled', true); // disable button
+            },
+            success: function (data) {
+                var json = jQuery.parseJSON(data);
+                if (!json.campaignId) {
+                    jQuery('#new_campaign_message').html('<span style="color:red;">An error occured: ' + json.message + '</span>');
+                } else {
+                    jQuery('#campaign_name').val('');
+                    jQuery('#new_campaign_message').html('');
+                    add_campaign_rows.hide('slow');
+                    jQuery('#new_campaign_button>span').text('Add new campaign');
+                    jQuery('#campaign_id').append('<option value="' + json.campaignId + '" selected="selected">' + json.name + '</option>');
+                    jQuery('#new_campaign_message').html('');
+                    add_campaign_button.after('<span id="success_message_new_campaign" style="color:green; padding-left: 10px;min-width:200px;">Campaign added succesfully</span>');
+                    setTimeout(function() {
+                        jQuery('#success_message_new_campaign').fadeOut('slow');
+                    }, 4000);
+                }
+            },
+            error: function (data) {
+                jQuery('#new_campaign_message').html('<span style="color:red;">An error occured</span>');
+                console.log('ERROR');
+                console.log(data);
+            },
+            complete: function () {
+                create_campaign_button.prop('disabled', false);
+                jQuery("#gr_spinner").hide();
+            }
+        })
+    } else {
+        jQuery('#new_campaign_message').html('<span style="color:red;">Wrong campaign name</span>');
+    }
+});
+</script>

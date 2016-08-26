@@ -1,0 +1,519 @@
+<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Export */?>
+
+<?php
+if (!$block->checkApiKey()) {
+    return;
+}
+
+$categories = $block->getStoreCategories();
+$campaigns = $block->getCampaigns();
+$autoresponders = $block->getAutoresponders();
+$automations = $block->getAutomations()->getData();
+
+?>
+
+<div>
+    <p>
+        GetResponse enables you to automatically move or copy your customers between GetResponse campaigns once they
+        purchase in a particular Magento product category. To do this, click “Create new” button and choose
+        automation parameters. When you select "move" option, the rule will move contacts from ALL existing campaigns
+        to the destination campaign. To add contacts to another campaign simply choose "copy" option.
+    </p>
+</div>
+
+<style>
+    .label {
+        font-weight: bold;
+    }
+
+    .label label {
+        display: inline-block;
+    }
+
+    td.label {
+        vertical-align: top;
+    }
+
+    .value input {
+        margin-top: 4px;
+        width: 100%;
+    }
+
+    .note {
+        color: #303030;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .admin__scope-old input[type="checkbox"] {
+        -moz-appearance: checkbox;
+    }
+
+    tr {
+        margin-bottom: 5px;
+    }
+</style>
+
+<form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
+    <?php echo $block->getBlockHtml('formkey'); ?>
+    <table class="config admin__scope-old">
+        <tbody>
+        <tr>
+            <td class="label" style="width: 200px;">
+                <label for="category" style="margin-top: 7px;">If purchased in the category</label>
+            </td>
+            <td class="value">
+                <select name="category" id="category">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
+                        $block->getSubcategories($category);
+                    }
+                    ?>
+                </select>
+                <p class="note">
+                    <span>
+                        Please select category.
+                    </span>
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="label" style="width: 200px;">
+                <label for="action" style="margin-top: 7px;">contact will be</label>
+            </td>
+            <td class="value">
+                <select name="action" id="action">
+                    <option value="move">moved</option>
+                    <option value="copy">copied</option>
+                </select>
+                <p class="note">
+                    <span>
+                        Please select action.
+                    </span>
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="label" style="width: 200px;">
+                <label for="campaign_id" style="margin-top: 7px;">Into the campaign</label>
+            </td>
+            <td class="value">
+                <select name="campaign_id" id="campaign_id">
+                    <?php
+                    if (count($campaigns) > 0) {
+                        foreach ($campaigns as $campaign) {
+                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+                <p class="note">
+                    <span>
+                        Please select target campaign.
+                    </span>
+                </p>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="label">
+                <label for="gr_autoresponder">Autoresponder sequence</label>
+            </td>
+            <td class="value">
+                <input
+                    class="GR_checkbox"
+                    type="checkbox"
+                    name="gr_autoresponder"
+                    id="gr_autoresponder"
+                    value="1"
+                />
+                <p class="note">
+                    <span>
+                        Select if you want to add customers to autoresponder sequence.
+                    </span>
+                </p>
+            </td>
+        </tr>
+
+        <tr class="cycle_day" style="display:none;">
+            <td class="label" style="width: 200px;">
+                <label for="cycle_day" style="padding-top: 7px;">Day of cycle</label>
+            </td>
+            <td class="value">
+                <select name="cycle_day" id="cycle_day">
+                    <option value="">Choose cycle day</option>
+                </select>
+                <p class="note">
+                    <span>
+                        Please select autoresponder cycle day.
+                    </span>
+                </p>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+        <span class="ui-button-text">
+            <span>Create new automation</span>
+        </span>
+    </button>
+</form>
+
+
+<div id="automations-table" class="admin__data-grid-wrap" data-role="grid-wrapper">
+    <table class="data-grid data-grid-draggable" data-role="grid">
+        <thead>
+        <tr>
+            <th class="data-grid-th" style="text-align:center;">
+                <span class="data-grid-cell-content" data-bind="text: label">ID</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Category</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Destination Campaign</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Action</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Cycle Day</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Status</span>
+            </th>
+
+            <th class="data-grid-th">
+                <span class="data-grid-cell-content" data-bind="text: label">Settings</span>
+            </th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        if (!empty($automations)) {
+            foreach ($automations as $automation) {
+                echo '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' . $automation['id'] . '">';
+                echo '<td style="text-align:center;" class="id">';
+                echo $automation['id'];
+                echo '</td>';
+
+                echo '<td class="category" data-value="' . $automation['category_id'] . '">';
+                echo $block->getCategoryName($automation['category_id']);
+                echo '</td>';
+
+                echo '<td class="campaign" value="' . $automation['campaign_id'] . '" data-value="' . $automation['campaign_id'] . '">';
+                echo $block->getCampaign($automation['campaign_id'])->name;
+                echo '</td>';
+
+                echo '<td class="action">';
+                echo $automation['action'];
+                echo '</td>';
+
+                echo '<td class="cycle_day_edit">';
+                echo ($automation['cycle_day'] == '') ? 'Not set' : $automation['cycle_day'];
+                echo '</td>';
+                ?>
+                <td>
+                    <div class="onoffswitch">
+                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
+                        <label class="onoffswitch-label" for="<?php echo 'myonoffswitch' . $automation['id'];?>">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                        <span id="<?php echo 'spinner' . $automation['id'];?>" style="position:absolute;top:2px;margin-left:60px;width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+                        <div style="position:absolute;top:0px;margin-left:60px;" id="<?php echo 'message' . $automation['id'];?>"></div>
+                    </div>
+                </td>
+                <td>
+                    <button data-id="<?php echo $automation['id'];?>" title="Toggle status" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
+                        <span class="ui-button-text">
+                            <span>Edit</span>
+                        </span>
+                    </button>
+                    <button data-id="<?php echo $automation['id'];?>" title="Toggle status" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
+                        <span class="ui-button-text">
+                            <span>Delete</span>
+                        </span>
+                    </button>
+                    <div style="display:inline-block;position:relative;float:left;">
+                        <span id="<?php echo 'spinner_delete' . $automation['id'];?>" style="width:16px;position:absolute;top:2px;margin-left:140px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+                    </div>
+                </td>
+                <?php
+                echo '</tr>';
+            }
+        }
+        ?>
+        </tbody>
+    </table>
+</div>
+
+
+
+<form id="edit_automation" method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="display:none;">
+    <?php echo $block->getBlockHtml('formkey'); ?>
+    <input name="edit_automation" id="edit_automation" type="hidden" value="true">
+    <table class="config admin__scope-old">
+        <tbody>
+        <tr>
+            <td>
+                <p class="note">
+                    <span>
+                        ID
+                    </span>
+                </p>
+                <input name="automation_id" id="automation_id" type="text" value="10" style="width:50px;margin-right: 20px;" readonly="readonly" />
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        If purchased in the category
+                    </span>
+                </p>
+                <select name="category" id="category" style="margin-right: 50px;">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
+                        $block->getSubcategories($category);
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        contact will be
+                    </span>
+                </p>
+                <select name="action" id="action" style="margin-right: 50px;">
+                    <option value="move">moved</option>
+                    <option value="copy">copied</option>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        into the campaign
+                    </span>
+                </p>
+                <select name="campaign_id_edit" id="campaign_id_edit" style="margin-right: 50px;">
+                    <?php
+                    if (count($campaigns) > 0) {
+                        foreach ($campaigns as $campaign) {
+                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        Cycle day.
+                    </span>
+                </p>
+                <select name="cycle_day_edit" id="cycle_day_edit">
+                    <option value="">Choose cycle day</option>
+                </select>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    <button id="save" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;">
+        <span class="ui-button-text">
+            <span>Save</span>
+        </span>
+    </button>
+    <button id="cancel_edit" title="Export" type="submit" class="action-default scalable save ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;>
+        <span class="ui-button-text">
+            <span>Cancel</span>
+        </span>
+    </button>
+</form>
+
+
+<script>
+    var cycle_day_checkbox = jQuery('#gr_autoresponder'), campaign_id = jQuery('#campaign_id'), campaign_id_edit = jQuery('#campaign_id_edit'), cycle_day = jQuery('#cycle_day'), cycle_day_edit = jQuery('#cycle_day_edit');
+
+    var autoresponders = <?php echo json_encode($autoresponders); ?>;
+
+    if (cycle_day_checkbox.prop('checked') == true) {
+        jQuery('.cycle_day').show();
+    }
+    cycle_day_checkbox.change(function () {
+        jQuery('.cycle_day').toggle('slow');
+    });
+
+    function populateSelectWithAutoresponders(cycle_day, campaign) {
+        cycle_day.empty();
+        var options = '';
+        var campaign_autoresponders = autoresponders[campaign.val()];
+        if (campaign_autoresponders == undefined) {
+            var campaign_autoresponders = autoresponders[campaign.attr('data-value')];
+        }
+        if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
+            options = '<option value="">Don\'t set cycle day</option>';
+            for (var i = 0; i < campaign_autoresponders.length; i++) {
+                options += '<option value="' + campaign_autoresponders[i]['dayOfCycle']
+                    + '">(Day: ' + campaign_autoresponders[i]['dayOfCycle'] + ') '
+                    + campaign_autoresponders[i]['name']
+                    + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
+            }
+        } else {
+            options = '<option value="">No autoresponders for chosen campaign!</option>';
+        }
+        cycle_day.append(options);
+    }
+
+    populateSelectWithAutoresponders(cycle_day, campaign_id);
+
+    campaign_id.change(function() {
+        populateSelectWithAutoresponders(cycle_day, campaign_id);
+    });
+
+    campaign_id_edit.change(function() {
+        populateSelectWithAutoresponders(cycle_day_edit, campaign_id_edit);
+    });
+
+    var url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
+    var toggle_buttons = jQuery('.onoffswitch-checkbox');
+    toggle_buttons.change(function() {
+        var automation_id = jQuery(this).attr('id').substr(13); // length of 'myonoffswitch'
+        var enable = jQuery(this).prop('checked');
+
+        jQuery.ajax({
+            type:   'post',
+            url:    url,
+            data:   {
+                form_key:   FORM_KEY,
+                toggle_status:  enable,
+                automation_id:  automation_id
+            },
+            beforeSend: function() {
+                jQuery('#spinner' + automation_id).show();
+                jQuery('#myonoffswitch' + automation_id).prop('disabled', true);
+                jQuery('#message' + automation_id).hide();
+            },
+            success: function(data) {
+                try {
+                    var json = jQuery.parseJSON(data);
+                    if (json.success == 'true') {
+                        jQuery('#message' + automation_id).show().html('<span style="color:green; padding-left: 10px;min-width:200px;">Success</span>');
+                        setTimeout(function() {
+                            jQuery('#message' + automation_id).fadeOut('slow');
+                        }, 4000);
+                        console.log(json.msg);
+                    } else {
+                        jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+                        setTimeout(function() {
+                            jQuery('#message' + automation_id).fadeOut('slow');
+                        }, 4000);
+                        jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+                        console.log(json.msg);
+                    }
+                } catch(e) {
+                    jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+                    setTimeout(function() {
+                        jQuery('#message' + automation_id).fadeOut('slow');
+                    }, 4000);
+                    jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+                    console.log('Error! Something bad happened while parsing!');
+                    console.log(e);
+                }
+            },
+            error: function(data) {
+                jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+                setTimeout(function() {
+                    jQuery('#message' + automation_id).fadeOut('slow');
+                }, 4000);
+                jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+                console.log('Error! Something bad happened!');
+                console.log(data);
+            },
+            complete: function() {
+                jQuery('#spinner' + automation_id).hide();
+                jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
+            }
+        });
+    });
+
+    var edit_buttons = jQuery('.edit_automation_button'), edit_form = jQuery('#edit_automation');
+    edit_buttons.click(function() {
+        var timeout = 0;
+        if (edit_form.is(":visible")) {
+            edit_form.hide('slow');
+            timeout = 600;
+        }
+        var that = this;
+        setTimeout(function() {
+            var automation_id = jQuery(that).parents('tr').find('.id').text();
+            jQuery(edit_form).find('#automation_id').val(automation_id);
+
+            var category_id = jQuery(that).parents('tr').find('.category').attr('data-value');
+            jQuery(edit_form).find('#category').val(category_id);
+
+            var action = jQuery(that).parents('tr').find('.action').text();
+            jQuery(edit_form).find('#action').val(action);
+
+            populateSelectWithAutoresponders(cycle_day_edit, jQuery(that).parents('tr').find('.campaign'));
+            var cycle_day = jQuery(that).parents('tr').find('.cycle_day_edit').text();
+            jQuery(edit_form).find('#cycle_day_edit').val(cycle_day);
+
+            var campaign_id = jQuery(that).parents('tr').find('.campaign').attr('data-value');
+            jQuery(edit_form).find('#campaign_id_edit').val(campaign_id);
+        }, timeout);
+
+        edit_form.show('slow');
+    });
+
+    function message(text) {
+        return '<div id="gr_integration_message" class="messages"><div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div></div>';
+    }
+
+    var delete_buttons = jQuery('.delete_automation_button');
+    delete_buttons.click(function() {
+        if (confirm('Are you sure you want to delete automation no. ' + jQuery(this).attr('data-id'))) {
+            var automation_id = jQuery(this).attr('data-id');
+            jQuery.ajax({
+                type:   'post',
+                url:    url,
+                data: {
+                    form_key: FORM_KEY,
+                    automation_id: automation_id,
+                    delete_automation: true
+                },
+                beforeSend: function() {
+                    jQuery('#spinner_delete' + automation_id).show();
+                },
+                success: function (data) {
+                    jQuery('#container').prepend(message('You successfully removed automation!')); // potwierdzenie
+                    setTimeout(function() {
+                        jQuery('#gr_integration_message').hide('slow');
+                    }, 4000);
+                    jQuery('#automation' + automation_id).hide('slow'); // koniec potwierdzenia
+                },
+                error: function (data) {
+                    console.log('error');
+                    console.log(data);
+                },
+                complete: function() {
+                    jQuery('#spinner_delete' + automation_id).hide();
+                }
+            });
+        }
+    });
+
+    jQuery('#cancel_edit').click(function(e) {
+        e.preventDefault();
+        edit_form.hide('slow');
+    });
+</script>

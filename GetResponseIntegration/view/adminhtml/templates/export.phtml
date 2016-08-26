@@ -1,0 +1,226 @@
+<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Export */?>
+
+<?php
+if (!$block->checkApiKey()) {
+    return;
+}
+$campaigns = $block->getCampaigns();
+$customers = $block->getCustomers();
+$customs = $block->getDefaultCustoms()->getData();
+$settings = $block->getSettings();
+$autoresponders = $block->getAutoresponders();
+?>
+
+<p>This option enables one-time export of contacts from your Magento account to GetResponse. Choose a target
+    campaign to which your contacts will be exported. If the campaign includes autoresponders select the sequence day
+    to add your contacts to. You can also create a new campaign for your Magento contacts by clicking "Add new
+    campaign". If you want to include visitors who subscribed via Magento web form module, check "Web form
+    subscription" option.
+</p>
+<p><strong>Please note: Each costumers export will include all of your entries from Magento database.</strong></p>
+<div>You have <?php echo count($customers); echo (count($customers) == 1) ? ' customer' : ' customers' ?>.</div>
+
+<style>
+    .label {
+        font-weight: bold;
+    }
+
+    .label label {
+        display: inline-block;
+    }
+
+    td.label {
+        vertical-align: top;
+    }
+
+    .value input {
+        margin-top: 4px;
+        width: 100%;
+    }
+
+    .note {
+        color: #303030;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .admin__scope-old input[type="checkbox"] {
+        -moz-appearance: checkbox;
+    }
+
+    tr {
+        margin-bottom: 5px;
+    }
+</style>
+
+<form method="post" action="<?php echo $block->getUrl('getresponseintegration/export/process'); ?>" style="margin-top: 20px;">
+    <?php echo $block->getBlockHtml('formkey'); ?>
+        <table class="config admin__scope-old">
+            <tbody>
+            <tr>
+                <td class="label" style="width: 200px;">
+                    <label for="campaign_id" style="margin-top: 7px;">Campaign</label>
+                </td>
+                <td class="value">
+                    <select name="campaign_id" id="campaign_id">
+                        <option value="">Choose campaign</option>
+                        <?php
+                        if (count($campaigns) > 0) {
+                            foreach ($campaigns as $campaign) {
+                                echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                    <div id="new_campaign_button" title="Add new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="cursor: pointer;">
+                        <span class="ui-button-text">
+                            <span>Add new campaign</span>
+                        </span>
+                    </div>
+                    <p class="note">
+                    <span>
+                        Please select target campaign.
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <?php include 'new_campaign.phtml'; ?>
+
+            <tr>
+                <td class="label">
+                    <label for="gr_sync_order_data">Update custom fields</label>
+                </td>
+                <td class="value">
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="gr_sync_order_data"
+                        id="gr_sync_order_data"
+                        value="1"
+                    />
+                    <p class="note">
+                    <span>
+                        Select if you want to export custom fields.
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr id="customNameFieldsRow" style="display: none;">
+                <td class="label">
+                    <label style="margin-top:7px;">Custom fields</label>
+                </td>
+                <td class="value">
+                    <div id="customNameFields">
+                        <div class="gr-custom-field">
+                            <select class="jsNarrowSelect" name="gr_custom_fields" multiple="multiple">
+                                <?php
+                                if (!empty($customs)) {
+                                    foreach ($customs as $custom) {
+                                        echo '<option data-inputvalue="' . $custom['custom_name'] . '" value="' . $custom['custom_value'] .
+                                            '" id="' . $custom['custom_value'] . '"', ( $custom['default'] == '1')
+                                            ? ' selected="selected"' : '', $custom['default'] == '1'
+                                            ? ' disabled="disabled"' : '', '>', $custom['custom_field'], '</option>';
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="note">
+                    <span>
+                        Choose custom fields you want to update.<br />Custom name must be composed using up to 32 characters, only a-z (lower case), numbers and "_".
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label">
+                    <label for="gr_autoresponder">Autoresponder sequence</label>
+                </td>
+                <td class="value">
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="gr_autoresponder"
+                        id="gr_autoresponder"
+                        value="1"
+                    />
+                    <p class="note">
+                    <span>
+                        Select if you want to add customers to autoresponder sequence.
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr class="cycle_day" style="display:none;">
+                <td class="label" style="width: 200px;">
+                    <label for="cycle_day">Day of cycle</label>
+                </td>
+                <td class="value">
+                    <select name="cycle_day" id="cycle_day">
+                        <option value="">Choose cycle day</option>
+                    </select>
+                    <p class="note">
+                    <span>
+                        Please select autoresponder cycle day.
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+        <span class="ui-button-text">
+            <span>Export</span>
+        </span>
+    </button>
+</form>
+
+<script>
+    var sod = jQuery('#gr_sync_order_data'), cfp = jQuery('#customNameFields'), cfprow = jQuery('#customNameFieldsRow');
+    var cycle_day_checkbox = jQuery('#gr_autoresponder'), campaign_id = jQuery('#campaign_id'), cycle_day = jQuery('#cycle_day');
+    if (sod.prop('checked') == true) {
+        cfp.show();
+    }
+    sod.change(function () {
+        cfprow.toggle('slow');
+    });
+    jQuery('.jsNarrowSelect').selectNarrowDown();
+
+    var autoresponders = <?php echo json_encode($autoresponders); ?>;
+
+    if (cycle_day_checkbox.prop('checked') == true) {
+        jQuery('.cycle_day').show();
+    }
+    cycle_day_checkbox.change(function () {
+        jQuery('.cycle_day').toggle('slow');
+    });
+
+    function populateSelectWithAutoresponders() {
+        cycle_day.empty();
+        var options = '';
+        var campaign_autoresponders = autoresponders[campaign_id.val()];
+        if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
+            for (var i = 0; i < campaign_autoresponders.length; i++) {
+                options += '<option value="' + campaign_autoresponders[i]['dayOfCycle']
+                    + '">(Day: ' + campaign_autoresponders[i]['dayOfCycle'] + ') '
+                    + campaign_autoresponders[i]['name']
+                    + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
+            }
+        } else {
+            options = '<option value="">No autoresponders for chosen campaign!</option>';
+        }
+        cycle_day.append(options);
+    }
+
+    populateSelectWithAutoresponders();
+
+    campaign_id.change(function() {
+        populateSelectWithAutoresponders();
+    });
+</script>
