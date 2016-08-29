@@ -69,7 +69,7 @@ $automations = $block->getAutomations()->getData();
         <tbody>
         <tr>
             <td class="label" style="width: 200px;">
-                <label for="category" style="margin-top: 7px;">If purchased in the category</label>
+                <label for="category" style="margin-top: 7px;">If customers buy in the category</label>
             </td>
             <td class="value">
                 <select name="category" id="category">
@@ -90,7 +90,7 @@ $automations = $block->getAutomations()->getData();
 
         <tr>
             <td class="label" style="width: 200px;">
-                <label for="action" style="margin-top: 7px;">contact will be</label>
+                <label for="action" style="margin-top: 7px;">they are</label>
             </td>
             <td class="value">
                 <select name="action" id="action">
@@ -107,7 +107,7 @@ $automations = $block->getAutomations()->getData();
 
         <tr>
             <td class="label" style="width: 200px;">
-                <label for="campaign_id" style="margin-top: 7px;">Into the campaign</label>
+                <label for="campaign_id" style="margin-top: 7px;">into the campaign</label>
             </td>
             <td class="value">
                 <select name="campaign_id" id="campaign_id">
@@ -129,7 +129,7 @@ $automations = $block->getAutomations()->getData();
 
         <tr class="cycle_day" style="display:none;">
             <td class="label" style="width: 200px;">
-                <label for="cycle_day" style="padding-top: 7px;">Day of cycle</label>
+                <label for="cycle_day" style="padding-top: 7px;">Add to autoresponder sequence</label>
             </td>
             <td class="value">
                 <select name="cycle_day" id="cycle_day">
@@ -158,7 +158,7 @@ $automations = $block->getAutomations()->getData();
     <table class="data-grid data-grid-draggable" data-role="grid">
         <thead>
         <tr>
-            <th class="data-grid-th" style="text-align:center;">
+            <th class="data-grid-th" style="text-align:center; display: none">
                 <span class="data-grid-cell-content" data-bind="text: label">ID</span>
             </th>
 
@@ -252,7 +252,7 @@ $automations = $block->getAutomations()->getData();
     <table class="config admin__scope-old">
         <tbody>
         <tr>
-            <td>
+            <td style="display: none;">
                 <p class="note">
                     <span>
                         ID
@@ -263,7 +263,7 @@ $automations = $block->getAutomations()->getData();
             <td>
                 <p class="note">
                     <span>
-                        If purchased in the category
+                        If customers buy in the category
                     </span>
                 </p>
                 <select name="category" id="category" style="margin-right: 50px;">
@@ -278,7 +278,7 @@ $automations = $block->getAutomations()->getData();
             <td>
                 <p class="note">
                     <span>
-                        contact will be
+                        they are
                     </span>
                 </p>
                 <select name="action" id="action" style="margin-right: 50px;">
@@ -305,7 +305,7 @@ $automations = $block->getAutomations()->getData();
             <td>
                 <p class="note">
                     <span>
-                        Cycle day.
+                        Add to autoresponder sequence
                     </span>
                 </p>
                 <select name="cycle_day_edit" id="cycle_day_edit">
@@ -342,7 +342,7 @@ $automations = $block->getAutomations()->getData();
             campaign_autoresponders = autoresponders[campaign.attr('data-value')];
         }
         if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
-            options = '<option value="">Don\'t set cycle day</option>';
+            options = '<option value="">Don\'t add to autoresponder sequence</option>';
             for (var i = 0; i < campaign_autoresponders.length; i++) {
                 options += '<option value="' + campaign_autoresponders[i]['dayOfCycle']
                     + '">(Day: ' + campaign_autoresponders[i]['dayOfCycle'] + ') '
