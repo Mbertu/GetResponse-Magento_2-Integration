@@ -191,7 +191,7 @@ $automations = $block->getAutomations()->getData();
         <?php
             foreach ($automations as $automation) {
                 echo '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' . $automation['id'] . '">';
-                echo '<td style="text-align:center;" class="id">';
+                echo '<td style="text-align:center;display:none;" class="id">';
                 echo $automation['id'];
                 echo '</td>';
 
@@ -213,6 +213,7 @@ $automations = $block->getAutomations()->getData();
                 ?>
                 <td>
                     <div class="onoffswitch">
+                        <?php if ($automation['active']) { ?> Enabled <?php } else { ?> Disabled <?php } ?>
                         <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
                         <label class="onoffswitch-label" for="<?php echo 'myonoffswitch' . $automation['id'];?>">
                             <span class="onoffswitch-inner"></span>
