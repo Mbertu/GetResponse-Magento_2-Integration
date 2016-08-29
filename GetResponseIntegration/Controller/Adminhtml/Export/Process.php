@@ -33,7 +33,7 @@ class Process extends \Magento\Backend\App\Action
 
         $campaign = $data['campaign_id'];
         if (empty($campaign)) {
-            $this->messageManager->addError('You need to choose a campaign!');
+            $this->messageManager->addErrorMessage('You need to choose a campaign!');
             $resultPage = $this->resultPageFactory->create();
             $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
             $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
@@ -46,7 +46,7 @@ class Process extends \Magento\Backend\App\Action
 
             foreach ($customs as $field => $name) {
                 if (false == preg_match('/^[_a-zA-Z0-9]{2,32}$/m', $name)) {
-                    $this->messageManager->addError('There is a problem with one of your custom field name! Field name
+                    $this->messageManager->addErrorMessage('There is a problem with one of your custom field name! Field name
                     must be composed using up to 32 characters, only a-z (lower case), numbers and "_".');
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
@@ -86,7 +86,7 @@ class Process extends \Magento\Backend\App\Action
             $response = $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
         }
 
-        $this->messageManager->addSuccess(
+        $this->messageManager->addSuccessMessage(
             'Contacts export process has completed (' .
             'created: ' . $this->stats['added'] .
             ', updated: ' . $this->stats['updated'] .

@@ -36,7 +36,7 @@ class Webformpost extends \Magento\Backend\App\Action
                 ->setSidebar($sidebar)
                 ->save();
 
-            $this->messageManager->addSuccess('Subscription settings successfully saved.');
+            $this->messageManager->addSuccessMessage('Subscription settings successfully saved.');
         }
 
         $resultPage = $this->resultPageFactory->create();

@@ -24,7 +24,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
 
                 foreach ($customs as $field => $name) {
                     if (false == preg_match('/^[_a-zA-Z0-9]{2,32}$/m', $name)) {
-                        $this->messageManager->addError('There is a problem with one of your custom field name! Field name
+                        $this->messageManager->addErrorMessage('There is a problem with one of your custom field name! Field name
                         must be composed using up to 32 characters, only a-z (lower case), numbers and "_".');
                         $resultPage = $this->resultPageFactory->create();
                         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
@@ -36,7 +36,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
             }
             $campaign_id = $data['campaign_id'];
             if (empty($campaign_id)) {
-                $this->messageManager->addError('You need to choose a campaign!');
+                $this->messageManager->addErrorMessage('You need to choose a campaign!');
                 $resultPage = $this->resultPageFactory->create();
                 $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
                 $resultPage->getConfig()->getTitle()->prepend('Subscribe via registration page');
@@ -61,7 +61,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
                 $this->updateCustoms($customs);
             }
 
-            $this->messageManager->addSuccess('Subscription settings successfully saved.');
+            $this->messageManager->addSuccessMessage('Subscription settings successfully saved.');
         }
 
         $resultPage = $this->resultPageFactory->create();

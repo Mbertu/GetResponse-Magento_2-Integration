@@ -21,13 +21,18 @@ class GetResponseAPI3
      * Set api key and optionally API endpoint
      * @param      $api_key
      * @param null $api_url
+     * @param null $enterprise_domain
      */
-    public function __construct($api_key, $api_url = null)
+    public function __construct($api_key, $api_url = null, $enterprise_domain = null)
     {
         $this->api_key = $api_key;
 
         if (!empty($api_url)) {
             $this->api_url = $api_url;
+        }
+
+        if (!empty($enterprise_domain)) {
+            $this->enterprise_domain = $enterprise_domain;
         }
     }
 
@@ -333,6 +338,18 @@ class GetResponseAPI3
         $params = json_encode($params);
         $url = $this->api_url  . '/' .  $api_method;
 
+        $headers = array(
+            'X-Auth-Token: api-key ' . $this->api_key,
+            'Content-Type: application/json',
+            'User-Agent: PHP GetResponse client 0 . 0 . 1',
+            'X-APP-ID: d7a458d2-1a75-4296-b417-ed601697e289'
+        );
+
+        // for GetResponse 360
+        if (isset($this->enterprise_domain)) {
+            $headers[] = 'X-Domain: ' . $this->enterprise_domain;
+        }
+
         $options = array(
             CURLOPT_URL => $url,
             CURLOPT_ENCODING => 'gzip,deflate',
@@ -340,16 +357,8 @@ class GetResponseAPI3
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_TIMEOUT => $this->timeout,
             CURLOPT_HEADER => false,
-            CURLOPT_USERAGENT => 'User-Agent: PHP GetResponse client 0.0.2',
-            CURLOPT_HTTPHEADER => array(
-                'X-Auth-Token: api-key ' . $this->api_key,
-                'Content-Type: application/json',
-                'X-APP-ID: d7a458d2-1a75-4296-b417-ed601697e289')
+            CURLOPT_HTTPHEADER => $headers
         );
-
-        if (!empty($this->enterprise_domain)) {
-            $options[CURLOPT_HTTPHEADER][] = 'X-Domain: ' . $this->enterprise_domain;
-        }
 
         if ($http_method == 'POST') {
             $options[CURLOPT_POST] = 1;

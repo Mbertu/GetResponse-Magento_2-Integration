@@ -43,6 +43,20 @@ class InstallSchema implements InstallSchemaInterface
             'GR Api Key'
         )
         ->addColumn(
+            'api_url',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            null,
+            ['nullable' => true],
+            'GR Api Url'
+        )
+        ->addColumn(
+            'api_domain',
+            \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+            null,
+            ['nullable' => true],
+            'GR Api Domain'
+        )
+        ->addColumn(
             'active_subscription',
             \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
             null,

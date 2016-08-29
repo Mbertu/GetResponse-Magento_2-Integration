@@ -8,6 +8,8 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <script src="GetResponse_GetResponseIntegration::js/jquery.js" />
+        <script src="GetResponse_GetResponseIntegration::js/jquery.noconflict.js" />
+    </head>
         <css src="GetResponse_GetResponseIntegration::css/onoffswitch.css" />
     </head>
     <body>

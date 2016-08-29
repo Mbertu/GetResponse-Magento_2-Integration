@@ -61,10 +61,11 @@ class Settings extends \Magento\Framework\View\Element\Template
 
     public function getAllFormsFromGr()
     {
-        $api_key = $api_key = $this->getApiKey();
+        $settings = $this->getSettings();
         $forms = [];
 
-        $client = new GetResponseAPI3($api_key);
+        $client = new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
+
         $newForms = $client->getForms(array('query' => array('status' => 'enabled')));
         foreach ($newForms as $form) {
             if ($form->status == 'published') {
@@ -98,6 +99,33 @@ class Settings extends \Magento\Framework\View\Element\Template
         return false;
     }
 
+    public function getLastPostedApiAccount()
+    {
+        $data = $this->getRequest()->getPostValue();
+        if (!empty($data['getresponse_360_account']) && 1 == $data['getresponse_360_account']) {
+            return $data['getresponse_360_account'];
+        }
+        return 0;
+    }
+
+    public function getLastPostedApiUrl()
+    {
+        $data = $this->getRequest()->getPostValue();
+        if (!empty($data['getresponse_api_url'])) {
+            return $data['getresponse_api_url'];
+        }
+        return false;
+    }
+
+    public function getLastPostedApiDomain()
+    {
+        $data = $this->getRequest()->getPostValue();
+        if (!empty($data['getresponse_api_domain'])) {
+            return $data['getresponse_api_domain'];
+        }
+        return false;
+    }
+
     public function getAutomations()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -108,12 +136,13 @@ class Settings extends \Magento\Framework\View\Element\Template
 
     public function checkApiKey()
     {
-        $api_key = $this->getApiKey();
-        if (empty($api_key)) {
+        $settings = $this->getSettings();
+
+        if (empty($settings['api_key'])) {
             return 0;
         }
 
-        $client = new GetResponseAPI3($api_key);
+        $client = new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
         $response = $client->ping();
 
         if (isset($response->accountId)) {

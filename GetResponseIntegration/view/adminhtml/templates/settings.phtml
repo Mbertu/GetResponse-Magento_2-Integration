@@ -1,6 +1,7 @@
 <?php /** @var $block \GetResponse\GetResponseIntegration\Block\Settings */?>
 <?php
 $isApiActive = $block->checkApiKey();
+$settings = $block->getSettings();
 ?>
 <style>
     .label {
@@ -36,13 +37,12 @@ $isApiActive = $block->checkApiKey();
 <div class="accordion">
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/save'); ?>">
     <?php echo $block->getBlockHtml('formkey'); ?>
-    <div class="config admin__scope-old">
-    <table>
+    <table class="config admin__scope-old">
         <tbody>
             <?php if (!$isApiActive) : ?>
                 <tr>
                     <td class="label">
-                        <label for="getresponse_api_key" style="padding-top:0px;">
+                        <label for="getresponse_api_key" style="padding-top:0px; width: 90px;">
                             API Key
                         </label>
                     </td>
@@ -58,6 +58,58 @@ $isApiActive = $block->checkApiKey();
                         </p>
                     </td>
                 </tr>
+                <tr>
+                    <td class="label">
+                        <label for="getresponse_360_account" style="padding-top:0px;"></label>
+                    </td>
+                    <td class="value">
+                        <input
+                            class="GR_checkbox"
+                            type="checkbox"
+                            name="getresponse_360_account"
+                            id="getresponse_360_account"
+                            value="1"
+                            <?php if ($block->getLastPostedApiAccount()) { ?>checked="checked"<?php } ?>
+                        />
+                        <span>I've purchased the Enterprise plan</span>
+                    </td>
+                </tr>
+
+                <tr class="getresponse_360_account_options" <?php if (1 != $block->getLastPostedApiAccount()) { ?>style="display: none;"<?php } ?>>
+                    <td class="label">
+                        <label for="getresponse_api_url" style="margin-top: 7px;">Account type</label>
+                    </td>
+                    <td class="value">
+                        <select name="getresponse_api_url" id="getresponse_api_url">
+                            <option value="https://api3.getresponse360.pl/v3" <?php if('https://api3.getresponse360.pl/v3' == $block->getLastPostedApiUrl()) { ?> selected="selected"<?php } ?>>GetResponse360 PL</option>
+                            <option value="https://api3.getresponse360.com/v3" <?php if('https://api3.getresponse360.com/v3' == $block->getLastPostedApiUrl()) { ?> selected="selected"<?php } ?>>GetResponse360 COM</option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                Please select GetResponse account type.
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="getresponse_360_account_options" <?php if (1 != $block->getLastPostedApiAccount()) { ?>style="display: none;"<?php } ?>>
+                    <td class="label"">
+                        <label for="getresponse_api_domain" style="padding-top:0px;">
+                            Your domain
+                        </label>
+                    </td>
+                    <td class="value">
+                        <input type="text" name="getresponse_api_domain" id="getresponse_api_domain"
+                               value="<?php echo $block->getLastPostedApiDomain();?>"
+                               class="input-text admin__control-text">
+                        <p class="note">
+                            <span>
+                                Enter your domain without protocol https:// eg: "yourdomainname.com"
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
             <?php else : ?>
                 <tr>
                     <td class="label">
@@ -109,7 +161,7 @@ $isApiActive = $block->checkApiKey();
         ?>
         </tbody>
     </table>
-    </div>
+    <br/>
     <?php if (!$isApiActive) : ?>
     <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
         <span class="ui-button-text">
@@ -118,4 +170,15 @@ $isApiActive = $block->checkApiKey();
     </button>
     <?php endif; ?>
 </form>
+
+<script type="text/javascript">
+    var mx_account = jQuery('#getresponse_360_account'), mx_options = jQuery('.getresponse_360_account_options');
+    if (mx_account.prop('checked') == true) {
+        mx_options.show();
+    }
+    mx_account.change(function () {
+        mx_options.toggle('slow');
+    });
+</script>
+
 </div>

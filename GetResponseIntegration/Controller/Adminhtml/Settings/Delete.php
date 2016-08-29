@@ -17,33 +17,24 @@ class Delete extends \Magento\Backend\App\Action
 
     public function execute()
     {
-        $block = $this->_objectManager->get('GetResponse\GetResponseIntegration\Block\Settings');
-        $api_key = $block->getApiKey();
+        $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
 
-        $client = new GetResponseAPI3($api_key);
-        $response = $client->ping();
+        $settings = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
+        $settings->load($storeId, 'id_shop')->delete();
 
-        if (isset($response->accountId)) {
-            $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+        $account = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Account');
+        $account->load($storeId, 'id_shop')->delete();
 
-            $settings = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
-            $settings->load($storeId, 'id_shop')->delete();
+        $webform = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Webform');
+        $webform->load($storeId, 'id_shop')->delete();
 
-            $account = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Account');
-            $account->load($response->accountId, 'account_id')->delete();
-
-            $webform = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Webform');
-            $webform->load($storeId, 'id_shop')->delete();
-
-            $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
-            $automations = $automation->getCollection()
-                ->addFieldToFilter('id_shop', $storeId);
-            foreach ($automations as $automation) {
-                $automation->delete();
-            }
-
-            $this->messageManager->addSuccess('You disconnected your Magento from GetResponse.');
+        $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
+        $automations = $automation->getCollection()->addFieldToFilter('id_shop', $storeId);
+        foreach ($automations as $automation) {
+            $automation->delete();
         }
+
+        $this->messageManager->addSuccessMessage('You disconnected your Magento from GetResponse.');
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
