@@ -1,17 +1,15 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:27
- */
 
 namespace GetResponse\GetResponseIntegration\Observer;
 
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 
+/**
+ * Class SubscribeFromOrder
+ * @package GetResponse\GetResponseIntegration\Observer
+ */
 class SubscribeFromOrder implements ObserverInterface
 {
     /**
@@ -21,7 +19,9 @@ class SubscribeFromOrder implements ObserverInterface
 
     protected $all_custom_fields;
 
+    /** @var GetResponseAPI3 */
     public $grApi;
+
     /**
      * Constructor
      *
@@ -89,8 +89,7 @@ class SubscribeFromOrder implements ObserverInterface
         $subscriber->loadByEmail($customer->getEmail());
 
         if ($subscriber->isSubscribed() == true) {
-            $api_key = $block->getApiKey();
-            $this->grApi = new GetResponseAPI3($api_key);
+            $this->grApi = $block->getClient();
 
             $this->all_custom_fields = $this->getCustomFields();
 
@@ -115,7 +114,8 @@ class SubscribeFromOrder implements ObserverInterface
                     $product = $this->_objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
                     $product_categories = $product->getCategoryIds();
 
-                    if ($category = array_intersect($product_categories, $automations_categories)) {
+                    $category = array_intersect($product_categories, $automations_categories);
+                    if ($category) {
                         foreach ($category as $c) {
                             if ($category_ids[$c]['action'] == 'move') {
                                 $move_subscriber = true;

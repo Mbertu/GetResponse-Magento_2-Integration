@@ -1,32 +1,29 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:27
- */
 
 namespace GetResponse\GetResponseIntegration\Observer;
 
+use GetResponse\GetResponseIntegration\Block\Settings;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Framework\ObjectManagerInterface;
 
+/**
+ * Class SubscribeFromRegister
+ * @package GetResponse\GetResponseIntegration\Observer
+ */
 class SubscribeFromRegister implements ObserverInterface
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
     /**
-     * Constructor
-     *
-     * @param \Magento\Framework\Registry $coreRegistry
+     * SubscribeFromRegister constructor.
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    public function __construct(ObjectManagerInterface $objectManager)
+    {
         $this->_objectManager = $objectManager;
     }
 
@@ -38,13 +35,13 @@ class SubscribeFromRegister implements ObserverInterface
      */
     public function execute(EventObserver $observer)
     {
+        /** @var Settings $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $settings = $block->getSettings();
 
         if ($settings['active_subscription'] != true) {
             return $this;
         }
-        $api_key = $block->getApiKey();
         $customer = $observer->getEvent()->getCustomer();
 
         $subscriber = $this->_objectManager->create('Magento\Newsletter\Model\Subscriber');
@@ -56,13 +53,11 @@ class SubscribeFromRegister implements ObserverInterface
             $params['name'] = $customer->getFirstname() . ' ' . $customer->getLastname();
             $params['email'] = $customer->getEmail();
 
-            if (!empty($settings['cycle_day'])) {
-                $params['dayOfCycle'] = $settings['cycle_day'];
+            if (isset($settings['cycle_day'])) {
+                $params['dayOfCycle'] = (int)$settings['cycle_day'];
             }
 
-            $client = new GetResponseAPI3($api_key);
-
-            $response = $client->addContact($params);
+            $block->getClient()->addContact($params);
         }
 
         return $this;

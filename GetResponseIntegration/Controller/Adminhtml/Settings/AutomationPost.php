@@ -4,16 +4,28 @@ namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+ * Class AutomationPost
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class AutomationPost extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
 
+    /**
+     * AutomationPost constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
@@ -51,7 +63,7 @@ class AutomationPost extends \Magento\Backend\App\Action
             $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
             $category_id = (empty($data['category'])) ? '' : $data['category'];
             $action = (empty($data['action'])) ? '' : $data['action'];
-            $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
+            $cycle_day = (isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
 
             //editing
             if (isset($data['edit_automation'])) {

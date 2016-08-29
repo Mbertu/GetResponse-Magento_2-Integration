@@ -9,6 +9,10 @@
  */
 namespace GetResponse\GetResponseIntegration\Helper;
 
+/**
+ * Class GetResponseAPI3
+ * @package GetResponse\GetResponseIntegration\Helper
+ */
 class GetResponseAPI3
 {
     private $api_key;

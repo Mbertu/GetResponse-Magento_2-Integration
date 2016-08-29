@@ -1,16 +1,21 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Export;
 
+use GetResponse\GetResponseIntegration\Block\Settings;
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
+/**
+ * Class Process
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Export
+ */
 class Process extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
     protected $all_custom_fields;
 
+    /** @var GetResponseAPI3 */
     public $grApi;
 
     public $stats = [
@@ -20,14 +25,23 @@ class Process extends \Magento\Backend\App\Action
         'error'      => 0
     ];
 
+    /**
+     * Process constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
+        /** @var Settings $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $data = $this->getRequest()->getPostValue();
 
@@ -60,9 +74,7 @@ class Process extends \Magento\Backend\App\Action
         }
 
         $customers = $block->getCustomers();
-
-        $api_key = $block->getApiKey();
-        $this->grApi = new GetResponseAPI3($api_key);
+        $this->grApi = $block->getClient();
 
         $this->all_custom_fields = $this->getCustomFields();
 
@@ -77,21 +89,16 @@ class Process extends \Magento\Backend\App\Action
             }
             $custom_fields['ref'] = 'Magento2 GetResponse Integration Plugin';
 
-            if ($data['gr_autoresponder'] == 1 && $data['cycle_day'] != '') {
+            if (isset($data['cycle_day']) && $data['cycle_day'] != '') {
                 $cycle_day = (int) $data['cycle_day'];
             } else {
                 $cycle_day = null;
             }
 
-            $response = $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
+            $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
         }
 
-        $this->messageManager->addSuccessMessage(
-            'Contacts export process has completed (' .
-            'created: ' . $this->stats['added'] .
-            ', updated: ' . $this->stats['updated'] .
-            ', not added: ' . $this->stats['error'] . ')'
-        );
+        $this->messageManager->addSuccessMessage('Contacts export process has completed.');
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');

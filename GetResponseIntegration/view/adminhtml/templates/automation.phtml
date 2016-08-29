@@ -11,7 +11,7 @@ $autoresponders = $block->getAutoresponders();
 $automations = $block->getAutomations()->getData();
 
 ?>
-<?php if (!is_array($categories) || count($categories) == 0) { ?>
+<?php if (count($categories) == 0) { ?>
     <div class="message message-error error">
         <div data-ui-id="messages-message-error">
             You have no categories in your store. Please create category to set campaign rules.
@@ -62,7 +62,7 @@ $automations = $block->getAutomations()->getData();
     }
 </style>
 
-<?php if (is_array($categories) && count($categories) > 0) { ?>
+<?php if (count($categories) > 0) { ?>
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
     <?php echo $block->getBlockHtml('formkey'); ?>
     <table class="config admin__scope-old">
@@ -122,26 +122,6 @@ $automations = $block->getAutomations()->getData();
                 <p class="note">
                     <span>
                         Please select target campaign.
-                    </span>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label">
-                <label for="gr_autoresponder">Autoresponder sequence</label>
-            </td>
-            <td class="value">
-                <input
-                    class="GR_checkbox"
-                    type="checkbox"
-                    name="gr_autoresponder"
-                    id="gr_autoresponder"
-                    value="1"
-                />
-                <p class="note">
-                    <span>
-                        Select if you want to add customers to autoresponder sequence.
                     </span>
                 </p>
             </td>
@@ -349,23 +329,17 @@ $automations = $block->getAutomations()->getData();
 
 
 <script>
-    var cycle_day_checkbox = jQuery('#gr_autoresponder'), campaign_id = jQuery('#campaign_id'), campaign_id_edit = jQuery('#campaign_id_edit'), cycle_day = jQuery('#cycle_day'), cycle_day_edit = jQuery('#cycle_day_edit');
+    var campaign_id = jQuery('#campaign_id'), campaign_id_edit = jQuery('#campaign_id_edit'), cycle_day = jQuery('#cycle_day'), cycle_day_edit = jQuery('#cycle_day_edit');
 
     var autoresponders = <?php echo json_encode($autoresponders); ?>;
-
-    if (cycle_day_checkbox.prop('checked') == true) {
-        jQuery('.cycle_day').show();
-    }
-    cycle_day_checkbox.change(function () {
-        jQuery('.cycle_day').toggle('slow');
-    });
+    jQuery('.cycle_day').show();
 
     function populateSelectWithAutoresponders(cycle_day, campaign) {
         cycle_day.empty();
         var options = '';
         var campaign_autoresponders = autoresponders[campaign.val()];
         if (campaign_autoresponders == undefined) {
-            var campaign_autoresponders = autoresponders[campaign.attr('data-value')];
+            campaign_autoresponders = autoresponders[campaign.attr('data-value')];
         }
         if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
             options = '<option value="">Don\'t set cycle day</option>';

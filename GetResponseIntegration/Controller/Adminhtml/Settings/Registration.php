@@ -4,16 +4,28 @@ namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+ * Class Registration
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class Registration extends \Magento\Backend\App\Action
 {
     protected $resultPageFactory;
 
+    /**
+     * Registration constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');

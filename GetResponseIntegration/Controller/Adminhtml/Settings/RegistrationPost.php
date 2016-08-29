@@ -1,19 +1,35 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use GetResponse\GetResponseIntegration\Model\Customs;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+ * Class RegistrationPost
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class RegistrationPost extends \Magento\Backend\App\Action
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
 
+    /**
+     * RegistrationPost constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
@@ -45,7 +61,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
             }
             $enabled = $data['enabled'];
             $update = (isset($data['gr_sync_order_data'])) ? $data['gr_sync_order_data'] : 0;
-            $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
+            $cycle_day = (isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
             $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
             $settings = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
 
@@ -71,9 +87,13 @@ class RegistrationPost extends \Magento\Backend\App\Action
         return $resultPage;
     }
 
+    /**
+     * @param $customs
+     */
     public function updateCustoms($customs)
     {
         if (is_array($customs)) {
+            /** @var Customs $model */
             $model = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Customs');
             $all_customs = $model->getCollection()->addFieldToFilter('default', false);
             foreach ($all_customs as $custom) {

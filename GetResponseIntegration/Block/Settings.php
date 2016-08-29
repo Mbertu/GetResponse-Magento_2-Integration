@@ -3,18 +3,22 @@ namespace GetResponse\GetResponseIntegration\Block;
 
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 
+/**
+ * Class Settings
+ * @package GetResponse\GetResponseIntegration\Block
+ */
 class Settings extends \Magento\Framework\View\Element\Template
 {
-    /**
-     * @var \Amasty\HelloWorld\Helper\Data
-     */
-    protected $helper;
-
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
     protected $_objectManager;
 
+    /**
+     * Settings constructor.
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Framework\ObjectManagerInterface $objectManager
@@ -24,6 +28,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         $this->_objectManager = $objectManager;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCustomers()
     {
         $customers = $this->_objectManager->get('Magento\Customer\Model\Customer');
@@ -38,6 +45,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return $customers;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSettings()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -45,6 +55,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return $settings->load($storeId, 'id_shop')->getData();
     }
 
+    /**
+     * @return mixed
+     */
     public function getWebformSettings()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -52,6 +65,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return $webform_settings->load($storeId, 'id_shop')->getData();
     }
 
+    /**
+     * @return mixed
+     */
     public function getAccountInfo()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -59,6 +75,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return $account->load($storeId, 'id_shop');
     }
 
+    /**
+     * @return array
+     */
     public function getAllFormsFromGr()
     {
         $settings = $this->getSettings();
@@ -82,12 +101,18 @@ class Settings extends \Magento\Framework\View\Element\Template
         return $forms;
     }
 
+    /**
+     * @return mixed
+     */
     public function getActiveCustoms()
     {
         $customs = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Customs');
         return $customs->getCollection()->addFieldToFilter('active_custom', true);
     }
 
+    /**
+     * @return bool
+     */
     public function getLastPostedApiKey()
     {
         $data = $this->getRequest()->getPostValue();
@@ -99,6 +124,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return false;
     }
 
+    /**
+     * @return int
+     */
     public function getLastPostedApiAccount()
     {
         $data = $this->getRequest()->getPostValue();
@@ -108,6 +136,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return 0;
     }
 
+    /**
+     * @return bool
+     */
     public function getLastPostedApiUrl()
     {
         $data = $this->getRequest()->getPostValue();
@@ -117,6 +148,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function getLastPostedApiDomain()
     {
         $data = $this->getRequest()->getPostValue();
@@ -126,6 +160,9 @@ class Settings extends \Magento\Framework\View\Element\Template
         return false;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAutomations()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -134,16 +171,16 @@ class Settings extends \Magento\Framework\View\Element\Template
             ->addFieldToFilter('id_shop', $storeId);
     }
 
+    /**
+     * @return bool|int
+     */
     public function checkApiKey()
     {
-        $settings = $this->getSettings();
-
-        if (empty($settings['api_key'])) {
+        if (empty($this->getApiKey())) {
             return 0;
         }
 
-        $client = new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
-        $response = $client->ping();
+        $response = $this->getClient()->ping();
 
         if (isset($response->accountId)) {
             return true;
@@ -152,10 +189,22 @@ class Settings extends \Magento\Framework\View\Element\Template
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getApiKey()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
         $model = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
         return $model->load($storeId, 'id_shop')->getApiKey();
+    }
+
+    /**
+     * @return GetResponseAPI3
+     */
+    public function getClient()
+    {
+        $settings = $this->getSettings();
+        return new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
     }
 }

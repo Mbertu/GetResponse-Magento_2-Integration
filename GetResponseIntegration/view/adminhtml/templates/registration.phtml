@@ -215,7 +215,7 @@ $autoresponders = $block->getAutoresponders();
 
     function populateSelectWithAutoresponders() {
         cycle_day.empty();
-        var options = '';
+        var options = '<option value="0">Don\'t add to autoresponder sequence</option>';
         var campaign_autoresponders = autoresponders[campaign_id.val()];
         if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
             for (var i = 0; i < campaign_autoresponders.length; i++) {

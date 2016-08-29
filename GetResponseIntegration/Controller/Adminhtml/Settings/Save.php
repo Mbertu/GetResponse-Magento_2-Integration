@@ -5,10 +5,22 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 
+/**
+ * Class Save
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class Save extends \Magento\Backend\App\Action
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
 
+    /**
+     * Save constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
@@ -20,51 +32,47 @@ class Save extends \Magento\Backend\App\Action
      */
     public function execute()
     {
-        $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('GetResponse Account');
-
         $apiErrorMsg = 'The API key seems incorrect. Please check if you typed or pasted it correctly. If you recently generated a new key, please make sure you’re using the right one.';
 
         $data = $this->getRequest()->getPostValue();
+        if (!empty($data)) {
+            if (!empty($data['getresponse_api_key'])) {
 
-        if (empty($data) || empty($data['getresponse_api_key'])) {
-            $this->messageManager->addErrorMessage($apiErrorMsg);
-            return $resultPage;
-        }
+                $api_key = $data['getresponse_api_key'];
+                $api_url = null;
+                $api_domain = null;
 
-        $api_key = $data['getresponse_api_key'];
-        $api_url = null;
-        $api_domain = null;
+                if (isset($data['getresponse_360_account']) && 1 == $data['getresponse_360_account']) {
+                    $api_url = !empty($data['getresponse_api_url']) ? $data['getresponse_api_url'] : null;
+                    $api_domain = !empty($data['getresponse_api_domain']) ? $data['getresponse_api_domain'] : null;
+                }
 
-        if (isset($data['getresponse_360_account']) && 1 == $data['getresponse_360_account']) {
-            if (empty($data['getresponse_api_domain'])) {
+                $client = new GetResponseAPI3($api_key, $api_url, $api_domain);
+                $response = $client->ping();
+
+                if (isset($response->accountId)) {
+                    $this->storeData($response, $api_key, $api_url, $api_domain);
+                    $this->messageManager->addSuccessMessage('You connected your Magento to GetResponse.');
+                } else {
+                    $this->messageManager->addErrorMessage($apiErrorMsg);
+                }
+            } else {
                 $this->messageManager->addErrorMessage($apiErrorMsg);
-                return $resultPage;
             }
-            $api_url = $data['getresponse_api_url'];
-            $api_domain = $data['getresponse_api_domain'];
-            $client = new GetResponseAPI3($api_key, $api_url, $api_domain);
-        } else {
-            $client = new GetResponseAPI3($api_key);
         }
 
-        $response = $client->ping();
+        $resultPage = $this->resultPageFactory->create();
+        $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
+        $resultPage->getConfig()->getTitle()->prepend('GetResponse integration settings');
 
-        if (isset($response->accountId)) {
-            $this->storeData($response, $api_key, $api_url, $api_domain);
-            $this->messageManager->addSuccessMessage('You connected your Magento to GetResponse.');
-        } else {
-            $this->messageManager->addErrorMessage($apiErrorMsg);
-        }
         return $resultPage;
     }
 
     /**
-     * @param $response
-     * @param $api_key
-     * @param $api_url
-     * @param $api_domain
+     * @param object $response
+     * @param string $api_key
+     * @param string $api_url
+     * @param string $api_domain
      */
     private function storeData($response, $api_key, $api_url = null, $api_domain = null)
     {

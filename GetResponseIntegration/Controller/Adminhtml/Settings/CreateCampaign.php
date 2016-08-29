@@ -1,23 +1,39 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use GetResponse\GetResponseIntegration\Block\Export;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 
+/**
+ * Class CreateCampaign
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class CreateCampaign extends \Magento\Backend\App\Action
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
 
+    /**
+     * CreateCampaign constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     *
+     */
     public function execute()
     {
         $data = $this->getRequest()->getPostValue();
+        /** @var Export $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Export');
         $lang = substr($block->getStoreLanguage(), 0, 2);
 
@@ -31,9 +47,7 @@ class CreateCampaign extends \Magento\Backend\App\Action
             'subscriptionConfirmationSubjectId' => $data['confirmation_subject']
         ];
 
-        $grApi = new GetResponseAPI3($block->getApiKey());
-
-        echo json_encode($grApi->createCampaign($params));
+        echo json_encode($block->getClient()->createCampaign($params));
         die;
     }
 }

@@ -1,8 +1,10 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Block;
 
-
-
+/**
+ * Class Webform
+ * @package GetResponse\GetResponseIntegration\Block
+ */
 class Webform extends \Magento\Framework\View\Element\Template
 {
     /**
@@ -10,6 +12,12 @@ class Webform extends \Magento\Framework\View\Element\Template
      */
     protected $_objectManager;
 
+    /**
+     * Webform constructor.
+     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param array $data
+     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
         array $data = [],
@@ -20,6 +28,9 @@ class Webform extends \Magento\Framework\View\Element\Template
         $this->_objectManager = $objectManager;
     }
 
+    /**
+     * @return mixed
+     */
     public function getWebformSettings()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();

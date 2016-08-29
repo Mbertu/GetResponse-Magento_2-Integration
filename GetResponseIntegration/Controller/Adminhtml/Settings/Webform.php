@@ -1,21 +1,40 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+ * Class Webform
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
+ */
 class Webform extends \Magento\Backend\App\Action
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
 
+    /**
+     * @var GetResponseAPI3
+     */
     public $grApi;
 
+    /**
+     * Webform constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
