@@ -171,7 +171,9 @@ $settings = $block->getSettings();
     <?php endif; ?>
 </form>
 
-<?php include 'delete_confirmation.phtml'; ?>
+<div id="popup-mpdal" style="display: none;">
+    <div> This stops new subscriptions via forms, comments, or during account registration. </div>
+</div>
 
 <script type="text/javascript">
     var mx_account = jQuery('#getresponse_360_account'), mx_options = jQuery('.getresponse_360_account_options');
@@ -181,6 +183,44 @@ $settings = $block->getSettings();
     mx_account.change(function () {
         mx_options.toggle('slow');
     });
+
+    function confirmationOpened() {
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function($, modal) {
+                var url = '<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>';
+                var options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    title: 'Are you sure you want to disconnect from GetResponse?',
+                    buttons: [
+                        {
+                            text: $.mage.__('Yes, disconnect'),
+                            class: 'action-secondary action-dismiss',
+                            click: function () {
+                                window.location.href = url;
+                                return false;
+                            }
+                        },
+                        {
+                            text: $.mage.__('Stay connected'),
+                            class: 'action-primary action-accept',
+                            click: function () {
+                                this.closeModal();
+                            }
+                        }
+                    ]
+                };
+
+                var popup = modal(options, $('#popup-mpdal'));
+                $('#popup-mpdal').modal('openModal');
+            }
+        );
+    }
 </script>
 
 </div>
