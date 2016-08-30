@@ -1,5 +1,5 @@
-<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Settings */?>
 <?php
+/** @var $block \GetResponse\GetResponseIntegration\Block\Settings */
 $isApiActive = $block->checkApiKey();
 $settings = $block->getSettings();
 ?>
@@ -115,7 +115,8 @@ $settings = $block->getSettings();
                         <label for="getresponse_getresponseintegration_general_api_key">Status</label>
                     </td>
                     <td class="value">
-                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>">disconnect</a>)</div>
+<!--                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="--><?php //echo $block->getUrl('getresponseintegration/settings/delete'); ?><!--">disconnect</a>)</div>-->
+                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="#" id="getresponse_disconnect" data-bind="click: confirmationOpened">disconnect</a>)</div>
                     </td>
                 </tr>
                 <tr>
@@ -169,6 +170,8 @@ $settings = $block->getSettings();
     </button>
     <?php endif; ?>
 </form>
+
+<?php include 'delete_confirmation.phtml'; ?>
 
 <script type="text/javascript">
     var mx_account = jQuery('#getresponse_360_account'), mx_options = jQuery('.getresponse_360_account_options');
