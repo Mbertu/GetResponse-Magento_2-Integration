@@ -127,17 +127,30 @@ $automations = $block->getAutomations()->getData();
             </td>
         </tr>
 
-        <tr class="cycle_day" style="display:none;">
-            <td class="label" style="width: 200px;">
-                <label for="cycle_day" style="padding-top: 7px;">Add to autoresponder sequence</label>
+        <tr>
+            <td class="label">
+                <label for="gr_autoresponder" style="margin-top: 8px;">Add into the cycle on day</label>
             </td>
             <td class="value">
-                <select name="cycle_day" id="cycle_day">
-                    <option value="">Choose cycle day</option>
-                </select>
+                <input
+                    class="GR_checkbox"
+                    type="checkbox"
+                    name="gr_autoresponder"
+                    id="gr_autoresponder"
+                    value="1"
+                    <?php
+                    if (isset($settings['cycle_day']) && $settings['cycle_day'] != '') {
+                        echo ' checked="checked"';
+                    }
+                    ?>
+                />
+                <span class="cycle_day">
+                    <select name="cycle_day" id="cycle_day" disabled="disabled">
+                    </select>
+                </span>
                 <p class="note">
                     <span>
-                        Please select autoresponder cycle day.
+                        Select if you want to add customers to autoresponder sequence.
                     </span>
                 </p>
             </td>
@@ -204,7 +217,7 @@ $automations = $block->getAutomations()->getData();
                 echo '</td>';
 
                 echo '<td class="cycle_day_edit">';
-                echo ($automation['cycle_day'] == '') ? 'Not set' : $automation['cycle_day'];
+                echo (isset($automation['cycle_day']) and $automation['cycle_day'] != '') ? $automation['cycle_day'] : 'Not set';
                 echo '</td>';
 
                 echo '<td class="action">';
@@ -213,14 +226,14 @@ $automations = $block->getAutomations()->getData();
                 ?>
                 <td>
                     <div class="onoffswitch">
-                        <?php if ($automation['active']) { ?> Enabled <?php } else { ?> Disabled <?php } ?>
                         <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
-                        <label class="onoffswitch-label" for="<?php echo 'myonoffswitch' . $automation['id'];?>">
+                        <label class="onoffswitch-label" id="grlabel<?php echo $automation['id'];?>" for="<?php echo 'myonoffswitch' . $automation['id'];?>">
                             <span class="onoffswitch-inner"></span>
                             <span class="onoffswitch-switch"></span>
+                            <?php if ($automation['active']) { ?> Enabled <?php } else { ?> Disabled <?php } ?>
                         </label>
-                        <span id="<?php echo 'spinner' . $automation['id'];?>" style="position:absolute;top:2px;margin-left:60px;width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
-                        <div style="position:absolute;top:0px;margin-left:60px;" id="<?php echo 'message' . $automation['id'];?>"></div>
+                        <span id="<?php echo 'spinner' . $automation['id'];?>" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+                        <div style="top:0px;margin-left:6px;" id="<?php echo 'message' . $automation['id'];?>"></div>
                     </div>
                 </td>
                 <td>
@@ -235,7 +248,7 @@ $automations = $block->getAutomations()->getData();
                         </span>
                     </button>
                     <div style="display:inline-block;position:relative;float:left;">
-                        <span id="<?php echo 'spinner_delete' . $automation['id'];?>" style="width:16px;position:absolute;top:2px;margin-left:140px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+                        <span id="<?php echo 'spinner_delete' . $automation['id'];?>" style="width:16px;top:2px;margin-left:6px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
                     </div>
                 </td>
                 <?php
@@ -306,9 +319,21 @@ $automations = $block->getAutomations()->getData();
             <td>
                 <p class="note">
                     <span>
-                        Add to autoresponder sequence
+                        Add into the cycle on day
                     </span>
                 </p>
+                <input
+                    class="GR_checkbox"
+                    type="checkbox"
+                    name="gr_autoresponder"
+                    id="gr_autoresponder"
+                    value="1"
+                    <?php
+                    if (isset($automation['cycle_day']) && $automation['cycle_day'] != '0') {
+                        echo ' checked="checked"';
+                    }
+                    ?>
+                />
                 <select name="cycle_day_edit" id="cycle_day_edit">
                     <option value="">Choose cycle day</option>
                 </select>
@@ -343,15 +368,16 @@ $automations = $block->getAutomations()->getData();
             campaign_autoresponders = autoresponders[campaign.attr('data-value')];
         }
         if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
-            options = '<option value="">Don\'t add to autoresponder sequence</option>';
             for (var i = 0; i < campaign_autoresponders.length; i++) {
                 options += '<option value="' + campaign_autoresponders[i]['dayOfCycle']
                     + '">(Day: ' + campaign_autoresponders[i]['dayOfCycle'] + ') '
                     + campaign_autoresponders[i]['name']
                     + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
             }
+            cycle_day.prop('disabled', false);
         } else {
             options = '<option value="">No autoresponders for chosen campaign!</option>';
+            cycle_day.prop('disabled', true);
         }
         cycle_day.append(options);
     }
@@ -389,18 +415,14 @@ $automations = $block->getAutomations()->getData();
                 try {
                     var json = jQuery.parseJSON(data);
                     if (json.success == 'true') {
-                        jQuery('#message' + automation_id).show().html('<span style="color:green; padding-left: 10px;min-width:200px;">Success</span>');
-                        setTimeout(function() {
-                            jQuery('#message' + automation_id).fadeOut('slow');
-                        }, 4000);
-                        console.log(json.msg);
+                        var msg = (jQuery('#myonoffswitch' + automation_id).prop('checked') == 1) ? 'Enabled' : 'Disabled';
+                        jQuery('#grlabel' + automation_id).html(msg);
                     } else {
                         jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
                         setTimeout(function() {
                             jQuery('#message' + automation_id).fadeOut('slow');
                         }, 4000);
                         jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
-                        console.log(json.msg);
                     }
                 } catch(e) {
                     jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
@@ -408,8 +430,6 @@ $automations = $block->getAutomations()->getData();
                         jQuery('#message' + automation_id).fadeOut('slow');
                     }, 4000);
                     jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
-                    console.log('Error! Something bad happened while parsing!');
-                    console.log(e);
                 }
             },
             error: function(data) {
@@ -418,8 +438,6 @@ $automations = $block->getAutomations()->getData();
                     jQuery('#message' + automation_id).fadeOut('slow');
                 }, 4000);
                 jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
-                console.log('Error! Something bad happened!');
-                console.log(data);
             },
             complete: function() {
                 jQuery('#spinner' + automation_id).hide();

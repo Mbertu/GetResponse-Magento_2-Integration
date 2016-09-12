@@ -89,10 +89,10 @@ class Process extends \Magento\Backend\App\Action
             }
             $custom_fields['ref'] = 'Magento2 GetResponse Integration Plugin';
 
-            if (isset($data['cycle_day']) && $data['cycle_day'] != '') {
+            if (isset($data['gr_autoresponder']) && $data['cycle_day'] != '') {
                 $cycle_day = (int) $data['cycle_day'];
             } else {
-                $cycle_day = null;
+                $cycle_day = 0;
             }
 
             $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);

@@ -159,7 +159,10 @@ create_campaign_button.on('click', function(e) {
 
     var regex = /^[a-z0-9_]{3,64}$/;
     var campaign_name = jQuery('#campaign_name').val();
-    if(regex.test(campaign_name)) {
+
+    if (campaign_name == '') {
+        jQuery('#new_campaign_message').html('<span style="color:red;">The campaign name can\'t be empty.</span>');
+    } else if(regex.test(campaign_name)) {
         jQuery.ajax({
             type: "POST",
             url: url,
@@ -204,7 +207,7 @@ create_campaign_button.on('click', function(e) {
             }
         })
     } else {
-        jQuery('#new_campaign_message').html('<span style="color:red;">Wrong campaign name</span>');
+        jQuery('#new_campaign_message').html('<span style="color:red;">The campaign name is not valid.</span>');
     }
 });
 </script>

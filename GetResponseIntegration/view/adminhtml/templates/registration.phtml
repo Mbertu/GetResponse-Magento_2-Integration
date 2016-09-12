@@ -115,17 +115,30 @@ $autoresponders = $block->getAutoresponders();
 
             <?php include 'new_campaign.phtml'; ?>
 
-            <tr class="cycle_day">
-                <td class="label" style="width: 200px;">
-                    <label for="cycle_day" style="margin-top: 7px;">Autoresponder sequence</label>
+            <tr>
+                <td class="label">
+                    <label for="gr_autoresponder" style="margin-top: 8px;">Add into the cycle on day</label>
                 </td>
                 <td class="value">
-                    <select name="cycle_day" id="cycle_day">
-                        <option value="">Choose cycle day</option>
-                    </select>
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="gr_autoresponder"
+                        id="gr_autoresponder"
+                        value="1"
+                        <?php
+                        if (isset($settings['cycle_day']) && $settings['cycle_day'] != '0') {
+                            echo ' checked="checked"';
+                        }
+                        ?>
+                    />
+                    <span class="cycle_day">
+                        <select name="cycle_day" id="cycle_day" disabled="disabled">
+                        </select>
+                    </span>
                     <p class="note">
                     <span>
-                        Please select autoresponder cycle day.
+                        Select if you want to add customers to autoresponder sequence.
                     </span>
                     </p>
                 </td>
@@ -215,7 +228,7 @@ $autoresponders = $block->getAutoresponders();
 
     function populateSelectWithAutoresponders() {
         cycle_day.empty();
-        var options = '<option value="0">Don\'t add to autoresponder sequence</option>';
+        var options = '';
         var campaign_autoresponders = autoresponders[campaign_id.val()];
         if (typeof campaign_autoresponders == 'object' && campaign_autoresponders.length > 0) {
             for (var i = 0; i < campaign_autoresponders.length; i++) {
