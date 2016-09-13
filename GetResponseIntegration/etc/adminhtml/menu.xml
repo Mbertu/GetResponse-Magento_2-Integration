@@ -3,7 +3,7 @@
     <menu>
         <add id="GetResponse_GetResponseIntegration" title="GetResponse" module="GetResponse_GetResponseIntegration" sortOrder="100" resource="GetResponse_GetResponseIntegration::settings"/>
 
-        <add id="GetResponse_GetResponseIntegration::settings" title="GetResponse Account" module="GetResponse_GetResponseIntegration" sortOrder="100" parent="GetResponse_GetResponseIntegration" action="getresponseintegration/settings" resource="GetResponse_GetResponseIntegration::settings"/>
+        <add id="GetResponse_GetResponseIntegration::settings" title="GetResponse account" module="GetResponse_GetResponseIntegration" sortOrder="100" parent="GetResponse_GetResponseIntegration" action="getresponseintegration/settings" resource="GetResponse_GetResponseIntegration::settings"/>
 
         <add id="GetResponse_GetResponseIntegration::export" title="Export customers" module="GetResponse_GetResponseIntegration" sortOrder="100" parent="GetResponse_GetResponseIntegration" action="getresponseintegration/export" resource="GetResponse_GetResponseIntegration::settings"/>
 

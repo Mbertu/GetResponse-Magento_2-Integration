@@ -7,7 +7,7 @@
         </tab>
         <section id="getresponse_getresponseintegration" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                  showInStore="1">
-            <label>GetResponse Account</label>
+            <label>GetResponse account</label>
             <tab>getresponse</tab>
             <resource>GetResponse_GetResponseIntegrationaa::getresponse_getresponseintegrationaa</resource>
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"

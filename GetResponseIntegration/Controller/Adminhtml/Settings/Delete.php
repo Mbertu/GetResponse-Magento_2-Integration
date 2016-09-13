@@ -60,7 +60,7 @@ class Delete extends \Magento\Backend\App\Action
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('GetResponse Account');
+        $resultPage->getConfig()->getTitle()->prepend('GetResponse account');
 
         return $resultPage;
     }
