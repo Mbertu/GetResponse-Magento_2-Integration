@@ -87,12 +87,8 @@ class AutomationPost extends \Magento\Backend\App\Action
             }
 
             if (empty($campaign_id) || empty($category_id)) {
-                $this->messageManager->addErrorMessage('You need to choose a campaign and category!');
-                $resultPage = $this->resultPageFactory->create();
-                $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
-
-                return $resultPage;
+                echo json_encode(array('success' => 'false', 'msg' => 'You need to choose a campaign and category!'));
+                die;
             }
             $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
             $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
@@ -102,12 +98,8 @@ class AutomationPost extends \Magento\Backend\App\Action
                 ->addFieldToFilter('category_id', $category_id);
 
             if (count($automations_count) > 0) {
-                $this->messageManager->addErrorMessage('Automation has not been created. Rule for chosen category already exist.');
-                $resultPage = $this->resultPageFactory->create();
-                $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
-
-                return $resultPage;
+                echo json_encode(array('success' => 'false', 'msg' => 'Automation has not been created. Rule for chosen category already exist.'));
+                die;
             }
 
             $automation->setIdShop($storeId)
@@ -118,7 +110,8 @@ class AutomationPost extends \Magento\Backend\App\Action
                 ->setAction($action)
                 ->save();
 
-            $this->messageManager->addSuccessMessage('New automation rule has been created!');
+            echo json_encode(array('success' => 'false', 'msg' => 'New automation rule has been created!'));
+            die;
         }
 
         $resultPage = $this->resultPageFactory->create();

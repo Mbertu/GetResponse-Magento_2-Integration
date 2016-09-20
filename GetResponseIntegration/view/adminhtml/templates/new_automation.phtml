@@ -1,0 +1,210 @@
+<?php
+$categories = $block->getStoreCategories();
+$campaigns = $block->getCampaigns();
+$autoresponders = $block->getAutoresponders();
+$automations = $block->getAutomations()->getData();
+?>
+
+<div id="popup-mpdal" class="modal config admin__scope-old" style="width: 300px; display: none;">
+    <style>
+        .campaign_value {
+            /*border: 8px solid #EB5202;*/
+            padding-left: 0px;
+        }
+    </style>
+    <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
+        <?php echo $block->getBlockHtml('formkey'); ?>
+        <table class="config admin__scope-old">
+            <tbody>
+            <tr>
+                <td class="label">
+                    <label for="category" style="margin-top: 7px; width: 250px;" >If customers buy in the category</label>
+                </td>
+                <td class="value">
+                    <select name="category" id="category">
+                        <?php
+                        foreach ($categories as $category) {
+                            echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
+                            $block->getSubcategories($category);
+                        }
+                        ?>
+                    </select>
+                    <p class="note">
+                    <span>
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label" style="width: 200px;">
+                    <label for="action" style="margin-top: 7px;">they are</label>
+                </td>
+                <td class="value">
+                    <select name="action" id="action">
+                        <option value="move">moved</option>
+                        <option value="copy">copied</option>
+                    </select>
+                    <p class="note">
+                    <span>
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label" style="width: 200px;">
+                    <label for="campaign_id" style="margin-top: 7px;">into the campaign</label>
+                </td>
+                <td class="value">
+                    <select name="campaign_id" id="campaign_id">
+                        <?php
+                        if (count($campaigns) > 0) {
+                            foreach ($campaigns as $campaign) {
+                                echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                    <p class="note">
+                    <span>
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="label">
+                </td>
+                <td class="value">
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="gr_autoresponder"
+                        id="gr_autoresponder"
+                        value="1"
+                        style="margin-bottom: 5px;"
+                        <?php
+                        if (isset($settings['cycle_day']) && $settings['cycle_day'] != '') {
+                            echo ' checked="checked"';
+                        }
+                        ?>
+                    />
+                    <span>Add into the cycle on day</span>
+                    <br/>
+                    <span class="cycle_day">
+                        <select name="cycle_day" id="cycle_day" disabled="disabled">
+                        </select>
+                    </span>
+                    <p class="note">
+                    <span>
+                    </span>
+                    </p>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function confirmationOpened() {
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function($, modal) {
+                var popop_modal = jQuery('#popup-mpdal');
+                var url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
+                var urlRules = '<?php echo $block->getUrl('getresponseintegration/settings/automation'); ?>';
+
+                var options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    title: 'Create new campaign',
+                    buttons: [
+                        {
+                            text: $.mage.__('Create campaign'),
+                            class: 'action-primary action-accept',
+                            click: function () {
+                                var campaign_id = popop_modal.find('#campaign_id').val();
+                                var category = popop_modal.find('#category').val();
+                                var action = popop_modal.find('#action').val();
+                                var gr_autoresponder = popop_modal.find('#gr_autoresponder').prop('checked');
+                                var cycle_day = popop_modal.find('#cycle_day').val();
+
+                                jQuery.ajax({
+                                    type:   'post',
+                                    url:    url,
+                                    data:   {
+                                        form_key:   FORM_KEY,
+                                        campaign_id:  campaign_id,
+                                        category:  category,
+                                        action:  action,
+                                        gr_autoresponder:  gr_autoresponder,
+                                        cycle_day:  cycle_day
+                                    },
+                                    beforeSend: function() {
+
+                                    },
+                                    success: function(data) {
+                                        console.log(data);
+
+//                                        try {
+//                                            var json = jQuery.parseJSON(data);
+//                                            if (json.success == 'true') {
+//                                                var msg = (jQuery('#myonoffswitch' + automation_id).prop('checked') == 1) ? 'Enabled' : 'Disabled';
+//                                                jQuery('#grlabel' + automation_id).html(msg);
+//                                            } else {
+//                                                jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+//                                                setTimeout(function() {
+//                                                    jQuery('#message' + automation_id).fadeOut('slow');
+//                                                }, 4000);
+//                                                jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+//                                            }
+//                                        } catch(e) {
+//                                            jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+//                                            setTimeout(function() {
+//                                                jQuery('#message' + automation_id).fadeOut('slow');
+//                                            }, 4000);
+//                                            jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+//                                        }
+                                        $('#popup-mpdal').modal('closeModal');
+//                                        window.location.href = urlRules;
+//                                        return false;
+
+                                    },
+                                    error: function(data) {
+                                        jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
+                                        setTimeout(function() {
+                                            jQuery('#message' + automation_id).fadeOut('slow');
+                                        }, 4000);
+                                        jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+                                    },
+                                    complete: function() {
+                                        jQuery('#spinner' + automation_id).hide();
+                                        jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: $.mage.__('Cancel'),
+                            class: 'action-secondary action-dismiss',
+                            click: function () {
+                                popop_modal.find('#new_campaign_message').html('');
+                                this.closeModal();
+                            }
+                        }
+                    ]
+                };
+
+                var popup = modal(options, popop_modal);
+                popop_modal.modal('openModal');
+            }
+        );
+    }
+</script>

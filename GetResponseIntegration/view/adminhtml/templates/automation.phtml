@@ -62,109 +62,13 @@ $automations = $block->getAutomations()->getData();
     }
 </style>
 
-<?php if (count($categories) > 0) { ?>
-<form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
-    <?php echo $block->getBlockHtml('formkey'); ?>
-    <table class="config admin__scope-old">
-        <tbody>
-        <tr>
-            <td class="label" style="width: 200px;">
-                <label for="category" style="margin-top: 7px;">If customers buy in the category</label>
-            </td>
-            <td class="value">
-                <select name="category" id="category">
-                    <?php
-                    foreach ($categories as $category) {
-                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
-                        $block->getSubcategories($category);
-                    }
-                    ?>
-                </select>
-                <p class="note">
-                    <span>
-                        Please select category.
-                    </span>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label" style="width: 200px;">
-                <label for="action" style="margin-top: 7px;">they are</label>
-            </td>
-            <td class="value">
-                <select name="action" id="action">
-                    <option value="move">moved</option>
-                    <option value="copy">copied</option>
-                </select>
-                <p class="note">
-                    <span>
-                        Please select action.
-                    </span>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label" style="width: 200px;">
-                <label for="campaign_id" style="margin-top: 7px;">into the campaign</label>
-            </td>
-            <td class="value">
-                <select name="campaign_id" id="campaign_id">
-                    <?php
-                    if (count($campaigns) > 0) {
-                        foreach ($campaigns as $campaign) {
-                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
-                        }
-                    }
-                    ?>
-                </select>
-                <p class="note">
-                    <span>
-                        Please select target campaign.
-                    </span>
-                </p>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="label">
-                <label for="gr_autoresponder" style="margin-top: 8px;">Add into the cycle on day</label>
-            </td>
-            <td class="value">
-                <input
-                    class="GR_checkbox"
-                    type="checkbox"
-                    name="gr_autoresponder"
-                    id="gr_autoresponder"
-                    value="1"
-                    <?php
-                    if (isset($settings['cycle_day']) && $settings['cycle_day'] != '') {
-                        echo ' checked="checked"';
-                    }
-                    ?>
-                />
-                <span class="cycle_day">
-                    <select name="cycle_day" id="cycle_day" disabled="disabled">
-                    </select>
-                </span>
-                <p class="note">
-                    <span>
-                        Select if you want to add customers to autoresponder sequence.
-                    </span>
-                </p>
-            </td>
-        </tr>
-
-        </tbody>
-    </table>
-    <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+    <button id="getresponse_create_new_rule" data-bind="click: confirmationOpened" title="Add new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="cursor: pointer;">
         <span class="ui-button-text">
             <span>Create new rule</span>
         </span>
     </button>
-</form>
-<?php } ?>
+
+<?php include 'new_automation.phtml'; ?>
 
 <div id="automations-table" class="admin__data-grid-wrap" data-role="grid-wrapper">
     <?php if (!empty($automations)) { ?>
@@ -355,7 +259,8 @@ $automations = $block->getAutomations()->getData();
 
 
 <script>
-    var campaign_id = jQuery('#campaign_id'), campaign_id_edit = jQuery('#campaign_id_edit'), cycle_day = jQuery('#cycle_day'), cycle_day_edit = jQuery('#cycle_day_edit');
+    var campaign_id = jQuery('#campaign_id'), campaign_id_edit = jQuery('#campaign_id_edit');
+    var cycle_day = jQuery('#cycle_day'), cycle_day_edit = jQuery('#cycle_day_edit'), gr_autoresponder = jQuery('#gr_autoresponder');
 
     var autoresponders = <?php echo json_encode($autoresponders); ?>;
     jQuery('.cycle_day').show();
@@ -375,9 +280,11 @@ $automations = $block->getAutomations()->getData();
                     + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
             }
             cycle_day.prop('disabled', false);
+            gr_autoresponder.prop('disabled', false);
         } else {
             options = '<option value="">No autoresponders for chosen campaign!</option>';
             cycle_day.prop('disabled', true);
+            gr_autoresponder.prop('disabled', true).prop('checked', false);
         }
         cycle_day.append(options);
     }
