@@ -5,13 +5,16 @@ $autoresponders = $block->getAutoresponders();
 $automations = $block->getAutomations()->getData();
 ?>
 
-<div id="popup-mpdal" class="modal config admin__scope-old" style="width: 300px; display: none;">
+<div id="popup-mpdal" class="modal config admin__scope-old" style="display: none;">
     <style>
         .campaign_value {
             /*border: 8px solid #EB5202;*/
             padding-left: 0px;
         }
     </style>
+
+    <div id="grMessage"></div>
+
     <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
         <?php echo $block->getBlockHtml('formkey'); ?>
         <table class="config admin__scope-old">
@@ -109,6 +112,19 @@ $automations = $block->getAutomations()->getData();
 </div>
 
 <script type="text/javascript">
+
+    function sucessMsg(msg) {
+        return jQuery('#grMessage').html('<div class="message message-success success"><div data-ui-id="messages-message-success">'+msg+'</div></div>');
+    }
+
+    function noticeMsg(msg) {
+        return jQuery('#grMessage').html('<div class="message message-notice notice"><div data-ui-id="messages-message-notice">'+msg+'</div></div>');
+    }
+
+    function errorMsg(msg) {
+        return jQuery('#grMessage').html('<div class="message message-error error"><div data-ui-id="messages-message-error">'+msg+'</div></div>');
+    }
+
     function confirmationOpened() {
         require(
             [
@@ -127,7 +143,7 @@ $automations = $block->getAutomations()->getData();
                     title: 'Create new campaign',
                     buttons: [
                         {
-                            text: $.mage.__('Create campaign'),
+                            text: $.mage.__('Create new rule'),
                             class: 'action-primary action-accept',
                             click: function () {
                                 var campaign_id = popop_modal.find('#campaign_id').val();
@@ -152,41 +168,30 @@ $automations = $block->getAutomations()->getData();
                                     },
                                     success: function(data) {
                                         console.log(data);
-
-//                                        try {
-//                                            var json = jQuery.parseJSON(data);
-//                                            if (json.success == 'true') {
-//                                                var msg = (jQuery('#myonoffswitch' + automation_id).prop('checked') == 1) ? 'Enabled' : 'Disabled';
-//                                                jQuery('#grlabel' + automation_id).html(msg);
-//                                            } else {
-//                                                jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
-//                                                setTimeout(function() {
-//                                                    jQuery('#message' + automation_id).fadeOut('slow');
-//                                                }, 4000);
-//                                                jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
-//                                            }
-//                                        } catch(e) {
-//                                            jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
-//                                            setTimeout(function() {
-//                                                jQuery('#message' + automation_id).fadeOut('slow');
-//                                            }, 4000);
-//                                            jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
-//                                        }
-                                        $('#popup-mpdal').modal('closeModal');
+                                        sucessMsg();
+                                        try {
+                                            var json = jQuery.parseJSON(data);
+                                            if (json.success == 'true') {
+                                                sucessMsg(json.msg);
+                                                setTimeout(function() {
+                                                    $('#popup-mpdal').modal('closeModal');
+                                                }, 2000);
+                                            } else {
+                                                noticeMsg(json.msg);
+                                            }
+                                        } catch(e) {
+                                            errorMsg('Error');
+                                        }
 //                                        window.location.href = urlRules;
 //                                        return false;
 
                                     },
                                     error: function(data) {
-                                        jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
-                                        setTimeout(function() {
-                                            jQuery('#message' + automation_id).fadeOut('slow');
-                                        }, 4000);
-                                        jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
+                                        errorMsg('Error');
                                     },
                                     complete: function() {
-                                        jQuery('#spinner' + automation_id).hide();
-                                        jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
+//                                        jQuery('#spinner' + automation_id).hide();
+//                                        jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
                                     }
                                 });
                             }
