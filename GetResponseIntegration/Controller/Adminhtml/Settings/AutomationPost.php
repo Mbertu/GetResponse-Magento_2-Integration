@@ -44,15 +44,14 @@ class AutomationPost extends \Magento\Backend\App\Action
 
                 if ($automation_status == $status) {
                     echo json_encode(array('success' => 'true', 'msg' => 'Status successfully changed!'));
-                    die;
                 } else {
                     echo json_encode(array('success' => 'false', 'msg' => 'Something went wrong!'));
-                    die;
                 }
+                die;
             }
 
             // Deleting automation
-            if (isset($data['delete_automation'])) {
+            if (isset($data['delete_automation']) && 'true' == $data['delete_automation']) {
                 $automation_id = $data['automation_id'];
                 $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
                 $automation->load($automation_id)->delete();
@@ -66,8 +65,8 @@ class AutomationPost extends \Magento\Backend\App\Action
             $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
 
             //editing
-            if (isset($data['edit_automation'])) {
-                $campaign_id = (empty($data['campaign_id_edit'])) ? '' : $data['campaign_id_edit'];
+            if (isset($data['edit_automation']) && 'true' == $data['edit_automation'] ) {
+                $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
                 $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1) ? (int)$data['cycle_day_edit'] : '';
                 $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
                 $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
@@ -78,12 +77,11 @@ class AutomationPost extends \Magento\Backend\App\Action
                     ->setAction($action)
                     ->save();
 
-                $this->messageManager->addSuccessMessage('Campaign rules have been changed');
-                $resultPage = $this->resultPageFactory->create();
-                $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-                $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
+                $data['id'] = $automation_id;
+                $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
 
-                return $resultPage;
+                echo json_encode(array('success' => 'true', 'msg' => 'Campaign rules have been changed.', 'data' => $data));
+                die;
             }
 
             if (empty($campaign_id) || empty($category_id)) {
@@ -117,10 +115,13 @@ class AutomationPost extends \Magento\Backend\App\Action
             die;
         }
 
-        $resultPage = $this->resultPageFactory->create();
-        $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-        $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
+        echo json_encode(array('success' => 'false', 'msg' => 'OOps!'));
+        die;
 
-        return $resultPage;
+//        $resultPage = $this->resultPageFactory->create();
+//        $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
+//        $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
+//
+//        return $resultPage;
     }
 }

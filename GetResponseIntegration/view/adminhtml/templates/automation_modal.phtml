@@ -1,17 +1,4 @@
-<?php
-$categories = $block->getStoreCategories();
-$campaigns = $block->getCampaigns();
-$autoresponders = $block->getAutoresponders();
-$automations = $block->getAutomations()->getData();
-?>
-
 <div id="popup-mpdal" class="modal config admin__scope-old" style="display: none;">
-    <style>
-        .campaign_value {
-            /*border: 8px solid #EB5202;*/
-            padding-left: 0px;
-        }
-    </style>
 
     <span id="spinner" style="width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
 
@@ -19,6 +6,7 @@ $automations = $block->getAutomations()->getData();
 
     <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
         <?php echo $block->getBlockHtml('formkey'); ?>
+        <input type="hidden" id="edit_automation_id" name="automation_id" value=""/>
         <table class="config admin__scope-old">
             <tbody>
             <tr>
@@ -148,19 +136,19 @@ $automations = $block->getAutomations()->getData();
         + data.action
         + '</td>'
         + '<td>'
-        + '<div class="onoffswitch">'
+        + '<div class="onoffswitch" style="text-align: center;">'
         + '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="' + data.id + '" checked="checked">'
         + '<span id="spinner' + data.id + '" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="' + loaderSmall + '" /></span>'
         + '<div style="top:0px;margin-left:6px;" id="message' + data.id + '"></div>'
         + '</div>'
         + '</td>'
         + '<td>'
-        + '<button data-id="' + data.id + '" title="Toggle status" type="submit" class="toggle_button primary" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<button data-id="' + data.id + '" onclick="confirmationOpened(\'edit\','+data.id+')" title="Toggle status" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
         + '<span class="ui-button-text">'
         + '<span>Edit</span>'
         + '</span>'
         + '</button> '
-        + '<button data-id="' + data.id + '" title="Toggle status" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<button data-id="' + data.id + '" onclick="deleteOpened('+data.id+')" title="Toggle status" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
         + '<span class="ui-button-text">'
         + '<span>Delete</span>'
         + '</span>'
@@ -174,7 +162,21 @@ $automations = $block->getAutomations()->getData();
         jQuery('#automation_table').append(row);
     }
 
-    function confirmationOpened() {
+    function editRow(data) {
+        var row = jQuery('#automation'+data.id);
+        row.find('.category').text(data.category_name);
+        row.find('.campaign').text(data.campaign_name);
+        row.find('.cycle_day_edit').text(data.cycle_day);
+        row.find('.action').text(data.action);
+    }
+
+    function confirmationOpened(action_type, aid) {
+
+        var modal_title = (action_type == 'edit') ? 'Edit rule' : 'Create new rule';
+        if (aid != '') {
+            jQuery('#edit_automation_id').val(aid);
+        }
+
         require(
             [
                 'jquery',
@@ -188,32 +190,36 @@ $automations = $block->getAutomations()->getData();
                     type: 'popup',
                     responsive: true,
                     innerScroll: true,
-                    title: 'Create new rule',
+                    title: modal_title,
                     buttons: [
                         {
-                            text: $.mage.__('Create new rule'),
+                            text: $.mage.__(modal_title),
                             class: 'action-primary action-accept',
                             click: function () {
-                                var campaign_id = popop_modal.find('#campaign_id').val();
+                                var automation_id = popop_modal.find('#edit_automation_id').val();
+                                var campaign_id = popop_modal.find('#campaign_id option:selected').val();
                                 var campaign_name = popop_modal.find('#campaign_id option:selected').text();
                                 var category = popop_modal.find('#category').val();
                                 var category_name = popop_modal.find('#category option:selected').text();
                                 var action = popop_modal.find('#action').val();
                                 var gr_autoresponder = popop_modal.find('#gr_autoresponder').prop('checked');
                                 var cycle_day = popop_modal.find('#cycle_day').val();
+                                var edit_automation = (action_type == 'edit') ? 'true' : 'false';
 
                                 jQuery.ajax({
                                     type:   'post',
                                     url:    url,
                                     data:   {
                                         form_key:   FORM_KEY,
+                                        automation_id:  automation_id,
                                         campaign_id:  campaign_id,
                                         campaign_name: campaign_name,
                                         category:  category,
                                         category_name:  category_name,
                                         action:  action,
                                         gr_autoresponder:  gr_autoresponder,
-                                        cycle_day:  cycle_day
+                                        cycle_day:  cycle_day,
+                                        edit_automation:  edit_automation
                                     },
                                     beforeSend: function() {
                                         jQuery('#grMessage').hide();
@@ -224,21 +230,24 @@ $automations = $block->getAutomations()->getData();
                                             var json = jQuery.parseJSON(data);
                                             if (json.success == 'true') {
                                                 sucessMsg(json.msg);
-                                                console.log(json.data);
-                                                addNewRow(json.data);
+                                                if (action_type == 'edit') {
+                                                    editRow(json.data);
+                                                } else {
+                                                    addNewRow(json.data);
+                                                }
                                                 setTimeout(function() {
                                                     $('#popup-mpdal').modal('closeModal');
-                                                }, 2000);
+                                                }, 1500);
                                             } else {
                                                 noticeMsg(json.msg);
                                             }
                                         } catch(e) {
-                                            errorMsg('Error');
+                                            errorMsg('Error! Please try again.');
                                         }
 
                                     },
-                                    error: function(data) {
-                                        errorMsg('Error');
+                                    error: function(e) {
+                                        errorMsg('Error! Please try again.');
                                     },
                                     complete: function() {
                                         jQuery('#spinner').hide();
