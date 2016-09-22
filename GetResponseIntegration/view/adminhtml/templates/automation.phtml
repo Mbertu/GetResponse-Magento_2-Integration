@@ -104,7 +104,7 @@ $automations = $block->getAutomations()->getData();
         </thead>
         <tbody>
         <?php
-            foreach ($automationsAll as $automation) {
+            foreach ($automations as $automation) {
                 echo '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' . $automation['id'] . '">';
                 echo '<td style="text-align:center;display:none;" class="id">';
                 echo $automation['id'];
@@ -134,12 +134,12 @@ $automations = $block->getAutomations()->getData();
                     </div>
                 </td>
                 <td>
-                    <button data-id="<?php echo $automation['id'];?>" onclick="confirmationOpened('edit', '<?php echo $automation['id'];?>')" title="Toggle status" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
+                    <button data-id="<?php echo $automation['id'];?>" onclick="confirmationOpened('edit', '<?php echo $automation['id'];?>')" title="Edit rule" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
                         <span class="ui-button-text">
                             <span>Edit</span>
                         </span>
                     </button>
-                    <button data-id="<?php echo $automation['id'];?>" onclick="deleteOpened('<?php echo $automation['id'];?>')" title="Toggle status" type="submit" class="toggle_button primary" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
+                    <button data-id="<?php echo $automation['id'];?>" onclick="deleteOpened('<?php echo $automation['id'];?>')" title="Delete rule" type="submit" class="toggle_button primary" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">
                         <span class="ui-button-text">
                             <span>Delete</span>
                         </span>
@@ -159,98 +159,98 @@ $automations = $block->getAutomations()->getData();
 
 <?php include 'automation_modal.phtml'; ?>
 
-<!--<form id="edit_automation" method="post" action="--><?php //echo $block->getUrl('getresponseintegration/settings/automationpost'); ?><!--" style="display:none;">-->
-<!--    --><?php //echo $block->getBlockHtml('formkey'); ?>
-<!--    <input name="edit_automation" id="edit_automation" type="hidden" value="true">-->
-<!--    <table class="config admin__scope-old">-->
-<!--        <tbody>-->
-<!--        <tr>-->
-<!--            <td style="display: none;">-->
-<!--                <p class="note">-->
-<!--                    <span>-->
-<!--                        ID-->
-<!--                    </span>-->
-<!--                </p>-->
-<!--                <input name="automation_id" id="automation_id" type="text" value="10" style="width:50px;margin-right: 20px;" readonly="readonly" />-->
-<!--            </td>-->
-<!--            <td>-->
-<!--                <p class="note">-->
-<!--                    <span>-->
-<!--                        If customers buy in the category-->
-<!--                    </span>-->
-<!--                </p>-->
-<!--                <select name="category" id="category" style="margin-right: 50px;">-->
-<!--                    --><?php
-//                    foreach ($categories as $category) {
-//                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
-//                        $block->getSubcategories($category);
-//                    }
-//                    ?>
-<!--                </select>-->
-<!--            </td>-->
-<!--            <td>-->
-<!--                <p class="note">-->
-<!--                    <span>-->
-<!--                        they are-->
-<!--                    </span>-->
-<!--                </p>-->
-<!--                <select name="action" id="action" style="margin-right: 50px;">-->
-<!--                    <option value="move">moved</option>-->
-<!--                    <option value="copy">copied</option>-->
-<!--                </select>-->
-<!--            </td>-->
-<!--            <td>-->
-<!--                <p class="note">-->
-<!--                    <span>-->
-<!--                        into the campaign-->
-<!--                    </span>-->
-<!--                </p>-->
-<!--                <select name="campaign_id_edit" id="campaign_id_edit" style="margin-right: 50px;">-->
-<!--                    --><?php
-//                    if (count($campaigns) > 0) {
-//                        foreach ($campaigns as $campaign) {
-//                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
-//                        }
-//                    }
-//                    ?>
-<!--                </select>-->
-<!--            </td>-->
-<!--            <td>-->
-<!--                <p class="note">-->
-<!--                    <span>-->
-<!--                        Add into the cycle on day-->
-<!--                    </span>-->
-<!--                </p>-->
-<!--                <input-->
-<!--                    class="GR_checkbox"-->
-<!--                    type="checkbox"-->
-<!--                    name="gr_autoresponder"-->
-<!--                    id="gr_autoresponder"-->
-<!--                    value="1"-->
-<!--                    --><?php
-//                    if (isset($automation['cycle_day']) && $automation['cycle_day'] != '0') {
-//                        echo ' checked="checked"';
-//                    }
-//                    ?>
-<!--                />-->
-<!--                <select name="cycle_day_edit" id="cycle_day_edit">-->
-<!--                    <option value="">Choose cycle day</option>-->
-<!--                </select>-->
-<!--            </td>-->
-<!--            </tr>-->
-<!--        </tbody>-->
-<!--    </table>-->
-<!--    <button id="save" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;">-->
-<!--        <span class="ui-button-text">-->
-<!--            <span>Save</span>-->
-<!--        </span>-->
-<!--    </button>-->
-<!--    <button id="cancel_edit" title="Export" type="submit" class="action-default scalable save ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;>-->
-<!--        <span class="ui-button-text">-->
-<!--            <span>Cancel</span>-->
-<!--        </span>-->
-<!--    </button>-->
-<!--</form>-->
+<form id="edit_automation" method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="display:none;">
+    <?php echo $block->getBlockHtml('formkey'); ?>
+    <input name="edit_automation" id="edit_automation" type="hidden" value="true">
+    <table class="config admin__scope-old">
+        <tbody>
+        <tr>
+            <td style="display: none;">
+                <p class="note">
+                    <span>
+                        ID
+                    </span>
+                </p>
+                <input name="automation_id" id="automation_id" type="text" value="10" style="width:50px;margin-right: 20px;" readonly="readonly" />
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        If customers buy in the category
+                    </span>
+                </p>
+                <select name="category" id="category" style="margin-right: 50px;">
+                    <?php
+                    foreach ($categories as $category) {
+                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
+                        $block->getSubcategories($category);
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        they are
+                    </span>
+                </p>
+                <select name="action" id="action" style="margin-right: 50px;">
+                    <option value="move">moved</option>
+                    <option value="copy">copied</option>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        into the campaign
+                    </span>
+                </p>
+                <select name="campaign_id_edit" id="campaign_id_edit" style="margin-right: 50px;">
+                    <?php
+                    if (count($campaigns) > 0) {
+                        foreach ($campaigns as $campaign) {
+                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
+                        }
+                    }
+                    ?>
+                </select>
+            </td>
+            <td>
+                <p class="note">
+                    <span>
+                        Add into the cycle on day
+                    </span>
+                </p>
+                <input
+                    class="GR_checkbox"
+                    type="checkbox"
+                    name="gr_autoresponder"
+                    id="gr_autoresponder"
+                    value="1"
+                    <?php
+                    if (isset($automation['cycle_day']) && $automation['cycle_day'] != '0') {
+                        echo ' checked="checked"';
+                    }
+                    ?>
+                />
+                <select name="cycle_day_edit" id="cycle_day_edit">
+                    <option value="">Choose cycle day</option>
+                </select>
+            </td>
+            </tr>
+        </tbody>
+    </table>
+    <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;">
+        <span class="ui-button-text">
+            <span>Save</span>
+        </span>
+    </button>
+    <button id="cancel_edit" title="Cacnel" type="submit" class="action-default scalable save ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;>
+        <span class="ui-button-text">
+            <span>Cancel</span>
+        </span>
+    </button>
+</form>
 
 <div id="popup-delete" style="display: none;">
     <div>These rule will be permanently deleted. Are you sure?</div>
