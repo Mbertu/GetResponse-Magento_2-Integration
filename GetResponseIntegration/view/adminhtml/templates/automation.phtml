@@ -114,7 +114,7 @@ $automations = $block->getAutomations()->getData();
                 echo $block->getCategoryName($automation['category_id']);
                 echo '</td>';
 
-                echo '<td class="campaign" value="' . $automation['campaign_id'] . '" data-value="' . $automation['campaign_id'] . '">';
+                echo '<td class="campaign" data-value="' . $automation['campaign_id'] . '">';
                 echo $block->getCampaign($automation['campaign_id'])->name;
                 echo '</td>';
 
@@ -370,7 +370,7 @@ $automations = $block->getAutomations()->getData();
                 'jquery',
                 'Magento_Ui/js/modal/modal'
             ],
-            function($, modal, aid) {
+            function($, modal) {
                 var delete_url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
                 var options = {
                     type: 'popup',

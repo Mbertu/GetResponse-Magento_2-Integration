@@ -126,7 +126,7 @@
         + '<td class="category" data-value="' + data.category_id + '">'
         + data.category_name
         + '</td>'
-        + '<td class="campaign" value="' + data.campaign_id + '" data-value="' + data.campaign_id + '">'
+        + '<td class="campaign" data-value="' + data.campaign_id + '">'
         + data.campaign_name
         + '</td>'
         + '<td class="cycle_day_edit">'
@@ -164,17 +164,40 @@
 
     function editRow(data) {
         var row = jQuery('#automation'+data.id);
+
         row.find('.category').text(data.category_name);
+        row.find('.category').attr('data-value', data.category);
         row.find('.campaign').text(data.campaign_name);
+        row.find('.campaign').attr('data-value', data.campaign_id);
         row.find('.cycle_day_edit').text(data.cycle_day);
         row.find('.action').text(data.action);
     }
 
+    function updateModal() {
+        var popop_modal = jQuery('#popup-mpdal');
+        var automationTr = jQuery('#automation'+aid);
+
+        var category_id = automationTr.find('.category').attr('data-value');
+        popop_modal.find('#category').val(category_id);
+
+        var action = automationTr.find('.action').text();
+        popop_modal.find('#action').val(action);
+
+        populateSelectWithAutoresponders(cycle_day_edit, automationTr.find('.campaign'));
+        var cycle_day = automationTr.find('.cycle_day_edit').text();
+        popop_modal.find('#cycle_day').val(cycle_day);
+
+        var campaign_id = automationTr.find('.campaign').attr('data-value');
+        popop_modal.find('#campaign_id').val(campaign_id);
+    }
+
     function confirmationOpened(action_type, aid) {
 
+        jQuery('#grMessage').hide();
         var modal_title = (action_type == 'edit') ? 'Edit rule' : 'Create new rule';
         if (aid != '') {
             jQuery('#edit_automation_id').val(aid);
+            updateModal();
         }
 
         require(
