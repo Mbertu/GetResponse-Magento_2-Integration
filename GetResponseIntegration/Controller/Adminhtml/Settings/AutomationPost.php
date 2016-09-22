@@ -110,6 +110,9 @@ class AutomationPost extends \Magento\Backend\App\Action
                 ->setAction($action)
                 ->save();
 
+            $data['id'] = $automation->getId();
+            $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
+
             echo json_encode(array('success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data));
             die;
         }

@@ -13,6 +13,8 @@ $automations = $block->getAutomations()->getData();
         }
     </style>
 
+    <span id="spinner" style="width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
+
     <div id="grMessage"></div>
 
     <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="margin-top: 20px;">
@@ -114,15 +116,62 @@ $automations = $block->getAutomations()->getData();
 <script type="text/javascript">
 
     function sucessMsg(msg) {
-        return jQuery('#grMessage').html('<div class="message message-success success"><div data-ui-id="messages-message-success">'+msg+'</div></div>');
+        jQuery('#grMessage').html('<div class="message message-success success"><div data-ui-id="messages-message-success">'+msg+'</div></div>').show();
     }
 
     function noticeMsg(msg) {
-        return jQuery('#grMessage').html('<div class="message message-notice notice"><div data-ui-id="messages-message-notice">'+msg+'</div></div>');
+        jQuery('#grMessage').html('<div class="message message-notice notice"><div data-ui-id="messages-message-notice">'+msg+'</div></div>').show();
     }
 
     function errorMsg(msg) {
-        return jQuery('#grMessage').html('<div class="message message-error error"><div data-ui-id="messages-message-error">'+msg+'</div></div>');
+        jQuery('#grMessage').html('<div class="message message-error error"><div data-ui-id="messages-message-error">'+msg+'</div></div>').show();
+    }
+
+    function addNewRow(data) {
+
+        var loaderSmall = '<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>';
+
+        var row = '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' + data.id + '">'
+        + '<td style="text-align:center;display:none;" class="id">'
+        + data.id
+        + '</td>'
+        + '<td class="category" data-value="' + data.category_id + '">'
+        + data.category_name
+        + '</td>'
+        + '<td class="campaign" value="' + data.campaign_id + '" data-value="' + data.campaign_id + '">'
+        + data.campaign_name
+        + '</td>'
+        + '<td class="cycle_day_edit">'
+        + data.cycle_day
+        + '</td>'
+        + '<td class="action">'
+        + data.action
+        + '</td>'
+        + '<td>'
+        + '<div class="onoffswitch">'
+        + '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="' + data.id + '" checked="checked">'
+        + '<span id="spinner' + data.id + '" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="' + loaderSmall + '" /></span>'
+        + '<div style="top:0px;margin-left:6px;" id="message' + data.id + '"></div>'
+        + '</div>'
+        + '</td>'
+        + '<td>'
+        + '<button data-id="' + data.id + '" title="Toggle status" type="submit" class="toggle_button primary" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<span class="ui-button-text">'
+        + '<span>Edit</span>'
+        + '</span>'
+        + '</button> '
+        + '<button data-id="' + data.id + '" title="Toggle status" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<span class="ui-button-text">'
+        + '<span>Delete</span>'
+        + '</span>'
+        + '</button>'
+        + '<div style="display:inline-block;position:relative;float:left;">'
+        + '<span id="spinner_delete' + data.id + '" style="width:16px;top:2px;margin-left:6px;display:none;"><img src="' + loaderSmall + '" /></span>'
+        + '</div>'
+        + '</td>'
+        + '</tr>';
+
+        jQuery('#automation_table').append(row);
     }
 
     function confirmationOpened() {
@@ -134,20 +183,21 @@ $automations = $block->getAutomations()->getData();
             function($, modal) {
                 var popop_modal = jQuery('#popup-mpdal');
                 var url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
-                var urlRules = '<?php echo $block->getUrl('getresponseintegration/settings/automation'); ?>';
 
                 var options = {
                     type: 'popup',
                     responsive: true,
                     innerScroll: true,
-                    title: 'Create new campaign',
+                    title: 'Create new rule',
                     buttons: [
                         {
                             text: $.mage.__('Create new rule'),
                             class: 'action-primary action-accept',
                             click: function () {
                                 var campaign_id = popop_modal.find('#campaign_id').val();
+                                var campaign_name = popop_modal.find('#campaign_id option:selected').text();
                                 var category = popop_modal.find('#category').val();
+                                var category_name = popop_modal.find('#category option:selected').text();
                                 var action = popop_modal.find('#action').val();
                                 var gr_autoresponder = popop_modal.find('#gr_autoresponder').prop('checked');
                                 var cycle_day = popop_modal.find('#cycle_day').val();
@@ -158,21 +208,24 @@ $automations = $block->getAutomations()->getData();
                                     data:   {
                                         form_key:   FORM_KEY,
                                         campaign_id:  campaign_id,
+                                        campaign_name: campaign_name,
                                         category:  category,
+                                        category_name:  category_name,
                                         action:  action,
                                         gr_autoresponder:  gr_autoresponder,
                                         cycle_day:  cycle_day
                                     },
                                     beforeSend: function() {
-
+                                        jQuery('#grMessage').hide();
+                                        jQuery('#spinner').show();
                                     },
                                     success: function(data) {
-                                        console.log(data);
-                                        sucessMsg();
                                         try {
                                             var json = jQuery.parseJSON(data);
                                             if (json.success == 'true') {
                                                 sucessMsg(json.msg);
+                                                console.log(json.data);
+                                                addNewRow(json.data);
                                                 setTimeout(function() {
                                                     $('#popup-mpdal').modal('closeModal');
                                                 }, 2000);
@@ -182,16 +235,13 @@ $automations = $block->getAutomations()->getData();
                                         } catch(e) {
                                             errorMsg('Error');
                                         }
-//                                        window.location.href = urlRules;
-//                                        return false;
 
                                     },
                                     error: function(data) {
                                         errorMsg('Error');
                                     },
                                     complete: function() {
-//                                        jQuery('#spinner' + automation_id).hide();
-//                                        jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
+                                        jQuery('#spinner').hide();
                                     }
                                 });
                             }
