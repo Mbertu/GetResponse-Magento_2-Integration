@@ -85,7 +85,7 @@ class Settings extends \Magento\Framework\View\Element\Template
 
         $client = new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
 
-        $newForms = $client->getForms(array('query' => array('status' => 'enabled')));
+        $newForms = $client->getForms(['query' => ['status' => 'enabled']]);
         foreach ($newForms as $form) {
             if ($form->status == 'published') {
                 $forms['forms'][] = $form;

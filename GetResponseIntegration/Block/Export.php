@@ -171,7 +171,7 @@ class Export extends \Magento\Framework\View\Element\Template
      */
     public function getAutoresponders()
     {
-        $params = array('query' => array('triggerType' => 'onday', 'status' => 'active'));
+        $params = ['query' => ['triggerType' => 'onday', 'status' => 'active']];
         $result = $this->getClient()->getAutoresponders($params);
         $autoresponders = [];
 

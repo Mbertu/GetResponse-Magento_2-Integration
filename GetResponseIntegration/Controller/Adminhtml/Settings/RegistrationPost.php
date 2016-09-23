@@ -81,7 +81,7 @@ class RegistrationPost extends \Magento\Backend\App\Action
                     ->save();
 
                 if ($update == 1) {
-                    $customs = (isset($data['gr_custom_fields'])) ? $data['gr_custom_fields'] : array();
+                    $customs = (isset($data['gr_custom_fields'])) ? $data['gr_custom_fields'] : [];
                     $this->updateCustoms($customs);
                 }
             }

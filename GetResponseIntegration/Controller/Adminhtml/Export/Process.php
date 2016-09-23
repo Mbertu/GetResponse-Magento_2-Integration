@@ -120,27 +120,27 @@ class Process extends \Magento\Backend\App\Action
      *
      * @return mixed
      */
-    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = array())
+    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = [])
     {
         $name = trim($firstname) . ' ' . trim($lastname);
 
-        $params = array(
+        $params = [
             'name'       => $name,
             'email'      => $email,
-            'campaign'   => array('campaignId' => $campaign),
+            'campaign'   => ['campaignId' => $campaign],
             'ipAddress'  => $_SERVER['REMOTE_ADDR']
-        );
+        ];
 
         if (!empty($cycle_day)) {
             $params['dayOfCycle'] = (int) $cycle_day;
         }
 
-        $results = (array) $this->grApi->getContacts(array(
-            'query' => array(
+        $results = (array) $this->grApi->getContacts([
+            'query' => [
                 'email'      => $email,
                 'campaignId' => $campaign
-            )
-        ));
+            ]
+        ]);
 
         $contact = array_pop($results);
 
@@ -180,20 +180,20 @@ class Process extends \Magento\Backend\App\Action
      */
     public function mergeUserCustoms($results, $user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (is_array($results)) {
             foreach ($results as $customs) {
                 $value = $customs->value;
                 if (in_array($customs->name, array_keys($user_customs))) {
-                    $value = array($user_customs[$customs->name]);
+                    $value = [$user_customs[$customs->name]];
                     unset($user_customs[$customs->name]);
                 }
 
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $customs->customFieldId,
                     'value'         => $value
-                );
+                ];
             }
         }
 
@@ -208,7 +208,7 @@ class Process extends \Magento\Backend\App\Action
      */
     public function setCustoms($user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (empty($user_customs)) {
             return $custom_fields;
@@ -217,23 +217,23 @@ class Process extends \Magento\Backend\App\Action
         foreach ($user_customs as $name => $value) {
             // if custom field is already created on gr account set new value
             if (in_array($name, array_keys($this->all_custom_fields))) {
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $this->all_custom_fields[$name],
-                    'value'         => array($value)
-                );
+                    'value'         => [$value]
+                ];
             } else {
-                $custom = $this->grApi->addCustomField(array(
+                $custom = $this->grApi->addCustomField([
                     'name'   => $name,
                     'type'   => "text",
                     'hidden' => "false",
-                    'values' => array($value),
-                ));
+                    'values' => [$value],
+                ]);
 
                 if (!empty($custom) && !empty($custom->customFieldId)) {
-                    $custom_fields[] = array(
+                    $custom_fields[] = [
                         'customFieldId' => $custom->customFieldId,
-                        'value'         => array($value)
-                    );
+                        'value'         => [$value]
+                    ];
                 }
             }
         }
@@ -247,7 +247,7 @@ class Process extends \Magento\Backend\App\Action
      */
     public function getCustomFields()
     {
-        $all_customs = array();
+        $all_customs = [];
         $results     = $this->grApi->getCustomFields();
         if (!empty($results)) {
             foreach ($results as $ac) {

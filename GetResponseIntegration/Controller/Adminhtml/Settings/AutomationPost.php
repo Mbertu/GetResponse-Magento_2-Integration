@@ -31,7 +31,7 @@ class AutomationPost extends \Magento\Backend\App\Action
         $data = $this->getRequest()->getPostValue();
 
         if (empty($data)) {
-            echo json_encode(array('success' => 'false', 'msg' => 'Oops something went wrong!'));
+            echo json_encode(['success' => 'false', 'msg' => 'Oops something went wrong!']);
             die;
         }
 
@@ -47,9 +47,9 @@ class AutomationPost extends \Magento\Backend\App\Action
             $automation_status = $automation->load($automation_id)->getActive();
 
             if ($automation_status == $status) {
-                echo json_encode(array('success' => 'true', 'msg' => 'Status successfully changed!'));
+                echo json_encode(['success' => 'true', 'msg' => 'Status successfully changed!']);
             } else {
-                echo json_encode(array('success' => 'false', 'msg' => 'Something went wrong!'));
+                echo json_encode(['success' => 'false', 'msg' => 'Something went wrong!']);
             }
             die;
         }
@@ -62,7 +62,7 @@ class AutomationPost extends \Magento\Backend\App\Action
             $collection = $automation->getCollection()->addFieldToFilter('id_shop', $storeId);
 
             $automation->load($automation_id)->delete();
-            echo json_encode(array('success' => 'true', 'msg' => 'Automation successfully deleted!', 'total' => count($collection->load()->getItems())));
+            echo json_encode(['success' => 'true', 'msg' => 'Automation successfully deleted!', 'total' => count($collection->load()->getItems())]);
             die;
         }
 
@@ -87,12 +87,12 @@ class AutomationPost extends \Magento\Backend\App\Action
             $data['id'] = $automation_id;
             $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
 
-            echo json_encode(array('success' => 'true', 'msg' => 'Campaign rules have been changed.', 'data' => $data));
+            echo json_encode(['success' => 'true', 'msg' => 'Campaign rules have been changed.', 'data' => $data]);
             die;
         }
 
         if (empty($campaign_id) || empty($category_id)) {
-            echo json_encode(array('success' => 'false', 'msg' => 'You need to choose a campaign and category!'));
+            echo json_encode(['success' => 'false', 'msg' => 'You need to choose a campaign and category!']);
             die;
         }
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -103,7 +103,7 @@ class AutomationPost extends \Magento\Backend\App\Action
             ->addFieldToFilter('category_id', $category_id);
 
         if (count($automations_count) > 0) {
-            echo json_encode(array('success' => 'false', 'msg' => 'Automation has not been created. Rule for chosen category already exist.'));
+            echo json_encode(['success' => 'false', 'msg' => 'Automation has not been created. Rule for chosen category already exist.']);
             die;
         }
 
@@ -118,7 +118,7 @@ class AutomationPost extends \Magento\Backend\App\Action
         $data['id'] = $automation->getId();
         $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
 
-        echo json_encode(array('success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data));
+        echo json_encode(['success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data]);
         die;
     }
 }

@@ -171,7 +171,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getContacts($params = array())
+    public function getContacts($params = [])
     {
         return $this->call('contacts?' . $this->setParams($params));
     }
@@ -183,7 +183,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function updateContact($contact_id, $params = array())
+    public function updateContact($contact_id, $params = [])
     {
         return $this->call('contacts/' . $contact_id, 'POST', $params);
     }
@@ -205,7 +205,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getCustomFields($params = array())
+    public function getCustomFields($params = [])
     {
         return $this->call('custom-fields?' . $this->setParams($params));
     }
@@ -216,7 +216,7 @@ class GetResponseAPI3
      * @param string $cs_id obtained by API
      * @return mixed
      */
-    public function addCustomField($params = array())
+    public function addCustomField($params = [])
     {
         return $this->call('custom-fields', 'POST', $params);
     }
@@ -227,7 +227,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getAccountFromFields($params = array())
+    public function getAccountFromFields($params = [])
     {
         return $this->call('from-fields?' . $this->setParams($params));
     }
@@ -238,7 +238,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getAutoresponders($params = array())
+    public function getAutoresponders($params = [])
     {
         return $this->call('autoresponders?' . $this->setParams($params));
     }
@@ -292,7 +292,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getWebForms($params = array())
+    public function getWebForms($params = [])
     {
         return $this->call('webforms?' . $this->setParams($params));
     }
@@ -314,7 +314,7 @@ class GetResponseAPI3
      *
      * @return mixed
      */
-    public function getForms($params = array())
+    public function getForms($params = [])
     {
         return $this->call('forms?' . $this->setParams($params));
     }
@@ -328,33 +328,33 @@ class GetResponseAPI3
      * @return mixed
      * @throws Exception
      */
-    private function call($api_method = null, $http_method = 'GET', $params = array())
+    private function call($api_method = null, $http_method = 'GET', $params = [])
     {
         if (empty($api_method)) {
-            return (object)array(
+            return (object)[
                 'httpStatus' => '400',
                 'code' => '1010',
                 'codeDescription' => 'Error in external resources',
                 'message' => 'Invalid api method'
-            );
+            ];
         }
 
         $params = json_encode($params);
         $url = $this->api_url  . '/' .  $api_method;
 
-        $headers = array(
+        $headers = [
             'X-Auth-Token: api-key ' . $this->api_key,
             'Content-Type: application/json',
             'User-Agent: PHP GetResponse client 0 . 0 . 1',
             'X-APP-ID: d7a458d2-1a75-4296-b417-ed601697e289'
-        );
+        ];
 
         // for GetResponse 360
         if (isset($this->enterprise_domain)) {
             $headers[] = 'X-Domain: ' . $this->enterprise_domain;
         }
 
-        $options = array(
+        $options = [
             CURLOPT_URL => $url,
             CURLOPT_ENCODING => 'gzip,deflate',
             CURLOPT_FRESH_CONNECT => 1,
@@ -362,7 +362,7 @@ class GetResponseAPI3
             CURLOPT_TIMEOUT => $this->timeout,
             CURLOPT_HEADER => false,
             CURLOPT_HTTPHEADER => $headers
-        );
+        ];
 
         if ($http_method == 'POST') {
             $options[CURLOPT_POST] = 1;
@@ -387,9 +387,9 @@ class GetResponseAPI3
      *
      * @return string
      */
-    private function setParams($params = array())
+    private function setParams($params = [])
     {
-        $result = array();
+        $result = [];
         if (is_array($params)) {
             foreach ($params as $key => $value) {
                 $result[$key] = $value;
