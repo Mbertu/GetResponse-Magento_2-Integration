@@ -69,8 +69,7 @@ $automations = $block->getAutomations()->getData();
 </button>
 
 <div id="automations-table" class="admin__data-grid-wrap" data-role="grid-wrapper">
-    <?php if (!empty($automations)) { ?>
-    <table class="data-grid data-grid-draggable" data-role="grid" id="automation_table">
+    <table class="data-grid data-grid-draggable" data-role="grid" id="automation_table" style="<?php if (empty($automations)) { ?>display: none; <?php } ?>">
         <thead>
         <tr>
             <th class="data-grid-th" style="text-align:center; display: none">
@@ -128,7 +127,7 @@ $automations = $block->getAutomations()->getData();
                 ?>
                 <td style="text-align: center;">
                     <div class="onoffswitch">
-                        <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
+                        <input type="checkbox" onclick="changeRuleStatus('<?php echo $automation['id'];?>')" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
                         <span id="<?php echo 'spinner' . $automation['id'];?>" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
                         <div style="top:0px;margin-left:6px;" id="<?php echo 'message' . $automation['id'];?>"></div>
                     </div>
@@ -154,7 +153,6 @@ $automations = $block->getAutomations()->getData();
         ?>
         </tbody>
     </table>
-    <?php } ?>
 </div>
 
 <?php include 'automation_modal.phtml'; ?>
@@ -298,11 +296,9 @@ $automations = $block->getAutomations()->getData();
         populateSelectWithAutoresponders(cycle_day_edit, campaign_id_edit);
     });
 
-    var url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
-    var toggle_buttons = jQuery('.onoffswitch-checkbox');
-    toggle_buttons.change(function() {
-        var automation_id = jQuery(this).attr('id').substr(13); // length of 'myonoffswitch'
-        var enable = jQuery(this).prop('checked');
+    function changeRuleStatus(automation_id) {
+        var url = '<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>?isAjax=true';
+        var enable = jQuery('#myonoffswitch'+automation_id).prop('checked');
 
         jQuery.ajax({
             type:   'post',
@@ -352,8 +348,7 @@ $automations = $block->getAutomations()->getData();
                 jQuery('#myonoffswitch' + automation_id).prop('disabled', false);
             }
         });
-    });
-
+    }
 
     function message(text) {
         return '<div id="gr_integration_message" class="messages"><div class="message message-success success"><div data-ui-id="messages-message-success">' + text + '</div></div></div>';
@@ -396,12 +391,17 @@ $automations = $block->getAutomations()->getData();
                                         jQuery('#spinner_delete' + automation_id).show();
                                     },
                                     success: function (data) {
+                                        var json = jQuery.parseJSON(data);
+                                        console.log(json);
                                         jQuery('#container').prepend(message('You successfully removed automation!')); // potwierdzenie
                                         setTimeout(function() {
                                             jQuery('#gr_integration_message').hide('slow');
                                         }, 4000);
                                         jQuery('#automation' + automation_id).hide('slow'); // koniec potwierdzenia
                                         $('#popup-delete').modal('closeModal');
+                                        if (0 == json.total) {
+                                            jQuery('#automation_table').hide();
+                                        }
                                     },
                                     error: function (data) {
                                     },

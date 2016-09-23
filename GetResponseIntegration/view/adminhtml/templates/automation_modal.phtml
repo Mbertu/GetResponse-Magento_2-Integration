@@ -1,3 +1,4 @@
+<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Export */?>
 <div id="popup-mpdal" class="modal config admin__scope-old" style="display: none;">
 
     <span id="spinner" style="width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
@@ -120,24 +121,14 @@
         var loaderSmall = '<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>';
 
         var row = '<tr class="data-row" data-role="data-grid-bulk-row" id="automation' + data.id + '">'
-        + '<td style="text-align:center;display:none;" class="id">'
-        + data.id
-        + '</td>'
-        + '<td class="category" data-value="' + data.category_id + '">'
-        + data.category_name
-        + '</td>'
-        + '<td class="campaign" data-value="' + data.campaign_id + '">'
-        + data.campaign_name
-        + '</td>'
-        + '<td class="cycle_day_edit">'
-        + data.cycle_day
-        + '</td>'
-        + '<td class="action">'
-        + data.action
-        + '</td>'
+        + '<td style="text-align:center;display:none;" class="id">' + data.id + '</td>'
+        + '<td class="category" data-value="' + data.category_id + '">' + data.category_name + '</td>'
+        + '<td class="campaign" data-value="' + data.campaign_id + '">' + data.campaign_name + '</td>'
+        + '<td class="cycle_day_edit">' + data.cycle_day + '</td>'
+        + '<td class="action">' + data.action + '</td>'
         + '<td>'
         + '<div class="onoffswitch" style="text-align: center;">'
-        + '<input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="' + data.id + '" checked="checked">'
+        + '<input type="checkbox" onclick="changeRuleStatus(\''+data.id+'\')" "onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch' + data.id + '" checked="checked">'
         + '<span id="spinner' + data.id + '" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="' + loaderSmall + '" /></span>'
         + '<div style="top:0px;margin-left:6px;" id="message' + data.id + '"></div>'
         + '</div>'
@@ -159,7 +150,7 @@
         + '</td>'
         + '</tr>';
 
-        jQuery('#automation_table').append(row);
+        jQuery('#automation_table').show().append(row);
     }
 
     function editRow(data) {
@@ -173,7 +164,7 @@
         row.find('.action').text(data.action);
     }
 
-    function updateModal() {
+    function updateModal(aid) {
         var popop_modal = jQuery('#popup-mpdal');
         var automationTr = jQuery('#automation'+aid);
 
@@ -191,13 +182,13 @@
         popop_modal.find('#campaign_id').val(campaign_id);
     }
 
-    function confirmationOpened(action_type, aid) {
+    function confirmationOpened(action_type, aid = '') {
 
         jQuery('#grMessage').hide();
         var modal_title = (action_type == 'edit') ? 'Edit rule' : 'Create new rule';
         if (aid != '') {
             jQuery('#edit_automation_id').val(aid);
-            updateModal();
+            updateModal(aid);
         }
 
         require(

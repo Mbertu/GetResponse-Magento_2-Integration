@@ -30,98 +30,95 @@ class AutomationPost extends \Magento\Backend\App\Action
     {
         $data = $this->getRequest()->getPostValue();
 
-        if (!empty($data)) {
-            // Toggling status
-            if (isset($data['toggle_status'])) {
-                $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
-                $status = ($data['toggle_status'] == 'true') ? 1 : 0;
-                $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
-                $automation->load($automation_id)
-                    ->setActive($status)
-                    ->save();
+        if (empty($data)) {
+            echo json_encode(array('success' => 'false', 'msg' => 'Oops something went wrong!'));
+            die;
+        }
 
-                $automation_status = $automation->load($automation_id)->getActive();
+        // Toggling status
+        if (isset($data['toggle_status'])) {
+            $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
+            $status = ($data['toggle_status'] == 'true') ? 1 : 0;
+            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
+            $automation->load($automation_id)
+                ->setActive($status)
+                ->save();
 
-                if ($automation_status == $status) {
-                    echo json_encode(array('success' => 'true', 'msg' => 'Status successfully changed!'));
-                } else {
-                    echo json_encode(array('success' => 'false', 'msg' => 'Something went wrong!'));
-                }
-                die;
+            $automation_status = $automation->load($automation_id)->getActive();
+
+            if ($automation_status == $status) {
+                echo json_encode(array('success' => 'true', 'msg' => 'Status successfully changed!'));
+            } else {
+                echo json_encode(array('success' => 'false', 'msg' => 'Something went wrong!'));
             }
+            die;
+        }
 
-            // Deleting automation
-            if (isset($data['delete_automation']) && 'true' == $data['delete_automation']) {
-                $automation_id = $data['automation_id'];
-                $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
-                $automation->load($automation_id)->delete();
-                echo json_encode(array('success' => 'true', 'msg' => 'Automation successfully deleted!'));
-                die;
-            }
-
-            $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
-            $category_id = (empty($data['category'])) ? '' : $data['category'];
-            $action = (empty($data['action'])) ? '' : $data['action'];
-            $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
-
-            //editing
-            if (isset($data['edit_automation']) && 'true' == $data['edit_automation'] ) {
-                $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
-                $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1) ? (int)$data['cycle_day_edit'] : '';
-                $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
-                $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
-                $automation->load($automation_id)
-                    ->setCategoryId($category_id)
-                    ->setCampaignId($campaign_id)
-                    ->setCycleDay($cycle_day)
-                    ->setAction($action)
-                    ->save();
-
-                $data['id'] = $automation_id;
-                $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
-
-                echo json_encode(array('success' => 'true', 'msg' => 'Campaign rules have been changed.', 'data' => $data));
-                die;
-            }
-
-            if (empty($campaign_id) || empty($category_id)) {
-                echo json_encode(array('success' => 'false', 'msg' => 'You need to choose a campaign and category!'));
-                die;
-            }
+        // Deleting automation
+        if (isset($data['delete_automation']) && 'true' == $data['delete_automation']) {
+            $automation_id = $data['automation_id'];
             $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
-            $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
+            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
+            $collection = $automation->getCollection()->addFieldToFilter('id_shop', $storeId);
 
-            $automations_count = $automation->getCollection()
-                ->addFieldToFilter('id_shop', $storeId)
-                ->addFieldToFilter('category_id', $category_id);
+            $automation->load($automation_id)->delete();
+            echo json_encode(array('success' => 'true', 'msg' => 'Automation successfully deleted!', 'total' => count($collection->load()->getItems())));
+            die;
+        }
 
-            if (count($automations_count) > 0) {
-                echo json_encode(array('success' => 'false', 'msg' => 'Automation has not been created. Rule for chosen category already exist.'));
-                die;
-            }
+        $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
+        $category_id = (empty($data['category'])) ? '' : $data['category'];
+        $action = (empty($data['action'])) ? '' : $data['action'];
+        $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
 
-            $automation->setIdShop($storeId)
+        //editing
+        if (isset($data['edit_automation']) && 'true' == $data['edit_automation'] ) {
+            $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
+            $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1) ? (int)$data['cycle_day_edit'] : '';
+            $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
+            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
+            $automation->load($automation_id)
                 ->setCategoryId($category_id)
                 ->setCampaignId($campaign_id)
-                ->setActive(1)
                 ->setCycleDay($cycle_day)
                 ->setAction($action)
                 ->save();
 
-            $data['id'] = $automation->getId();
+            $data['id'] = $automation_id;
             $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
 
-            echo json_encode(array('success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data));
+            echo json_encode(array('success' => 'true', 'msg' => 'Campaign rules have been changed.', 'data' => $data));
             die;
         }
 
-        echo json_encode(array('success' => 'false', 'msg' => 'OOps!'));
-        die;
+        if (empty($campaign_id) || empty($category_id)) {
+            echo json_encode(array('success' => 'false', 'msg' => 'You need to choose a campaign and category!'));
+            die;
+        }
+        $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+        $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
 
-//        $resultPage = $this->resultPageFactory->create();
-//        $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::settings');
-//        $resultPage->getConfig()->getTitle()->prepend('Campaign rules');
-//
-//        return $resultPage;
+        $automations_count = $automation->getCollection()
+            ->addFieldToFilter('id_shop', $storeId)
+            ->addFieldToFilter('category_id', $category_id);
+
+        if (count($automations_count) > 0) {
+            echo json_encode(array('success' => 'false', 'msg' => 'Automation has not been created. Rule for chosen category already exist.'));
+            die;
+        }
+
+        $automation->setIdShop($storeId)
+            ->setCategoryId($category_id)
+            ->setCampaignId($campaign_id)
+            ->setActive(1)
+            ->setCycleDay($cycle_day)
+            ->setAction($action)
+            ->save();
+
+        $data['id'] = $automation->getId();
+        $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
+
+        echo json_encode(array('success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data));
+        die;
     }
 }
