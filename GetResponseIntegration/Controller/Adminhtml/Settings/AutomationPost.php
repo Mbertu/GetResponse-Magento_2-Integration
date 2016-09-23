@@ -70,12 +70,11 @@ class AutomationPost extends Action
         $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
         $category_id = (empty($data['category'])) ? '' : $data['category'];
         $action = (empty($data['action'])) ? '' : $data['action'];
-        $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1 && isset($data['cycle_day']) && $data['cycle_day'] != '') ? $data['cycle_day'] : '';
+        $cycle_day = (isset($data['gr_autoresponder']) && true == $data['gr_autoresponder']) ? (int)$data['cycle_day'] : '';
 
         //editing
         if (isset($data['edit_automation']) && 'true' == $data['edit_automation'] ) {
             $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
-            $cycle_day = (isset($data['gr_autoresponder']) && $data['gr_autoresponder'] == 1) ? (int)$data['cycle_day_edit'] : '';
             $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
             $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
             $automation->load($automation_id)

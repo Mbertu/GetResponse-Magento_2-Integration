@@ -63,7 +63,7 @@ class Export extends \Magento\Framework\View\Element\Template
      */
     public function getCampaigns()
     {
-        return $this->getClient()->getCampaigns();
+        return $this->getClient()->getCampaigns(['sort' => ['name' => 'asc']]);
     }
 
     /**

@@ -392,7 +392,6 @@ $automations = $block->getAutomations()->getData();
                                     },
                                     success: function (data) {
                                         var json = jQuery.parseJSON(data);
-                                        console.log(json);
                                         jQuery('#container').prepend(message('You successfully removed automation!')); // potwierdzenie
                                         setTimeout(function() {
                                             jQuery('#gr_integration_message').hide('slow');

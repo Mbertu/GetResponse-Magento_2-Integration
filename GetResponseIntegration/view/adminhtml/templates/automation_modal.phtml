@@ -182,6 +182,13 @@
         popop_modal.find('#campaign_id').val(campaign_id);
     }
 
+    function setDefaultValues() {
+        var popop_modal = jQuery('#popup-mpdal');
+        popop_modal.find('#category option:first').attr('selected','selected');
+        popop_modal.find('#action option:first').attr('selected','selected');
+        popop_modal.find('#campaign_id option:first').attr('selected','selected');
+    }
+
     function confirmationOpened(action_type, aid = '') {
 
         jQuery('#grMessage').hide();
@@ -189,6 +196,8 @@
         if (aid != '') {
             jQuery('#edit_automation_id').val(aid);
             updateModal(aid);
+        } else {
+            setDefaultValues();
         }
 
         require(
