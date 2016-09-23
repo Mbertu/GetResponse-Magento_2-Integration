@@ -1,14 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:27
- */
-
 namespace GetResponse\GetResponseIntegration\Model;
 
-class Customs extends \Magento\Framework\Model\AbstractModel {
+use Magento\Framework\Model\AbstractModel;
+
+/**
+ * Class Customs
+ * @package GetResponse\GetResponseIntegration\Model
+ */
+class Customs extends AbstractModel
+{
     /**
      * Model Initialization
      *

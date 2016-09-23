@@ -5,6 +5,7 @@ use GetResponse\GetResponseIntegration\Model\Account;
 use GetResponse\GetResponseIntegration\Model\Automation;
 use GetResponse\GetResponseIntegration\Model\Settings;
 use GetResponse\GetResponseIntegration\Model\Webform;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -12,7 +13,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Delete
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class Delete extends \Magento\Backend\App\Action
+class Delete extends Action
 {
     /**
      * @var PageFactory

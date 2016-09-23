@@ -2,6 +2,8 @@
 namespace GetResponse\GetResponseIntegration\Block;
 
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\View\Element\Template\Context;
 
 /**
  * Class Export
@@ -12,19 +14,17 @@ class Export extends \Magento\Framework\View\Element\Template
     public $stats;
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
     /**
      * Export constructor.
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param Context $context
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    public function __construct(Context $context, ObjectManagerInterface $objectManager)
+    {
         parent::__construct($context);
 
         $this->_objectManager = $objectManager;
@@ -139,10 +139,6 @@ class Export extends \Magento\Framework\View\Element\Template
     {
         $_categoryHelper = $this->_objectManager->get('\Magento\Catalog\Helper\Category');
         $categories = $_categoryHelper->getStoreCategories(true, false, true);
-
-//        $categories = $this->_objectManager->get('Magento\Catalog\Model\Category');
-//        $categories = $categories->getCollection()
-//            ->joinAttribute('name','catalog_category/name','entity_id',null,'left');
 
         return $categories;
     }

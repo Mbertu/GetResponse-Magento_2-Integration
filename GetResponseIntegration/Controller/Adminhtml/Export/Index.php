@@ -2,6 +2,7 @@
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Export;
 
 use GetResponse\GetResponseIntegration\Block\Export;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -9,7 +10,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Index
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Export
  */
-class Index extends \Magento\Backend\App\Action
+class Index extends Action
 {
     /**
      * @var PageFactory

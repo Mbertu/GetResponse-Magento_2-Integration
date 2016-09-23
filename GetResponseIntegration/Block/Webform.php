@@ -1,28 +1,29 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Block;
 
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
+
 /**
  * Class Webform
  * @package GetResponse\GetResponseIntegration\Block
  */
-class Webform extends \Magento\Framework\View\Element\Template
+class Webform extends Template
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
     /**
      * Webform constructor.
-     * @param \Magento\Framework\View\Element\Template\Context $context
+     * @param Context $context
      * @param array $data
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        array $data = [],
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    public function __construct(Context $context, array $data = [], ObjectManagerInterface $objectManager)
+    {
         parent::__construct($context, $data);
 
         $this->_objectManager = $objectManager;

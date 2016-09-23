@@ -3,6 +3,7 @@ namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Export;
 
 use GetResponse\GetResponseIntegration\Block\Settings;
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -10,7 +11,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Process
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Export
  */
-class Process extends \Magento\Backend\App\Action
+class Process extends Action
 {
     protected $resultPageFactory;
     protected $all_custom_fields;

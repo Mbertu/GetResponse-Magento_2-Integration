@@ -2,6 +2,7 @@
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
 use GetResponse\GetResponseIntegration\Model\Customs;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -9,7 +10,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class RegistrationPost
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class RegistrationPost extends \Magento\Backend\App\Action
+class RegistrationPost extends Action
 {
     /**
      * @var PageFactory

@@ -2,6 +2,7 @@
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
 use GetResponse\GetResponseIntegration\Block\Export;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -9,7 +10,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class CreateCampaign
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class CreateCampaign extends \Magento\Backend\App\Action
+class CreateCampaign extends Action
 {
     /**
      * @var PageFactory
@@ -28,7 +29,7 @@ class CreateCampaign extends \Magento\Backend\App\Action
     }
 
     /**
-     *
+     * Execute
      */
     public function execute()
     {

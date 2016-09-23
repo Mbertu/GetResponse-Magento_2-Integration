@@ -1,6 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
@@ -9,7 +10,7 @@ use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
  * Class Save
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class Save extends \Magento\Backend\App\Action
+class Save extends Action
 {
     /**
      * @var PageFactory

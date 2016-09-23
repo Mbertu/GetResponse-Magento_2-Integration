@@ -1,15 +1,18 @@
 <?php
-
 namespace GetResponse\GetResponseIntegration\Helper;
+
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Helper\AbstractHelper;
+use Magento\Framework\App\Helper\Context;
 
 /**
  * Class Data
  * @package GetResponse\GetResponseIntegration\Helper
  */
-class Data extends \Magento\Framework\App\Helper\AbstractHelper
+class Data extends AbstractHelper
 {
     /**
-     * @var \Magento\Framework\App\Config\ScopeConfigInterfac
+     * @var ScopeConfigInterface
      */
     protected $_scopeConfig;
 
@@ -18,15 +21,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Data constructor.
-     * @param \Magento\Framework\App\Helper\Context $context
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param Context $context
+     * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(
-        \Magento\Framework\App\Helper\Context $context,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-    ) {
+    public function __construct(Context $context, ScopeConfigInterface $scopeConfig)
+    {
         parent::__construct($context);
-
         $this->_scopeConfig = $scopeConfig;
     }
 

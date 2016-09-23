@@ -2,6 +2,7 @@
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
 use GetResponse\GetResponseIntegration\Block\Settings;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -9,7 +10,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Automation
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class Automation extends \Magento\Backend\App\Action
+class Automation extends Action
 {
     protected $resultPageFactory;
 

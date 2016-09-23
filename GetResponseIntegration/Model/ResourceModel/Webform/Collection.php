@@ -1,13 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:42
- */
 namespace GetResponse\GetResponseIntegration\Model\ResourceModel\Webform;
 
-class Webform extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+
+/**
+ * Class Webform
+ * @package GetResponse\GetResponseIntegration\Model\ResourceModel\Webform
+ */
+class Webform extends AbstractCollection
 {
     /**
      * Define resource model

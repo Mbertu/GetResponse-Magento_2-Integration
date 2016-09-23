@@ -1,10 +1,10 @@
 <?php
-
 namespace GetResponse\GetResponseIntegration\Observer;
 
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
+use Magento\Framework\ObjectManagerInterface;
 
 /**
  * Class SubscribeFromOrder
@@ -13,7 +13,7 @@ use Magento\Framework\Event\Observer as EventObserver;
 class SubscribeFromOrder implements ObserverInterface
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
@@ -25,11 +25,9 @@ class SubscribeFromOrder implements ObserverInterface
     /**
      * Constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    public function __construct(ObjectManagerInterface $objectManager) {
         $this->_objectManager = $objectManager;
     }
 

@@ -1,5 +1,4 @@
 <?php
-
 namespace GetResponse\GetResponseIntegration\Observer;
 
 use GetResponse\GetResponseIntegration\Block\Settings;

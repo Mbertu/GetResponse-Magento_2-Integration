@@ -1,6 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 
@@ -8,7 +9,7 @@ use Magento\Framework\View\Result\PageFactory;
  * Class Registration
  * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings
  */
-class Registration extends \Magento\Backend\App\Action
+class Registration extends Action
 {
     protected $resultPageFactory;
 
