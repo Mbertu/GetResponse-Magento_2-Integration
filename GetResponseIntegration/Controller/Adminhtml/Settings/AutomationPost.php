@@ -1,6 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
+use GetResponse\GetResponseIntegration\Model\Automation;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -11,7 +12,20 @@ use Magento\Framework\View\Result\PageFactory;
  */
 class AutomationPost extends Action
 {
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
+
+    /**
+     * @var int
+     */
+    private $storeId;
+
+    /**
+     * @var Automation
+     */
+    private $automation;
 
     /**
      * AutomationPost constructor.
@@ -22,6 +36,8 @@ class AutomationPost extends Action
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
+        $this->storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+        $this->automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
     }
 
     /**
@@ -40,12 +56,11 @@ class AutomationPost extends Action
         if (isset($data['toggle_status'])) {
             $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
             $status = ($data['toggle_status'] == 'true') ? 1 : 0;
-            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
-            $automation->load($automation_id)
+            $this->automation->load($automation_id)
                 ->setActive($status)
                 ->save();
 
-            $automation_status = $automation->load($automation_id)->getActive();
+            $automation_status = $this->automation->load($automation_id)->getActive();
 
             if ($automation_status == $status) {
                 echo json_encode(['success' => 'true', 'msg' => 'Status successfully changed!']);
@@ -55,16 +70,12 @@ class AutomationPost extends Action
             die;
         }
 
-        $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
-
         // Deleting automation
         if (isset($data['delete_automation']) && 'true' == $data['delete_automation']) {
             $automation_id = $data['automation_id'];
-            $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
-            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
-            $collection = $automation->getCollection()->addFieldToFilter('id_shop', $storeId);
+            $collection = $this->automation->getCollection()->addFieldToFilter('id_shop', $this->storeId);
 
-            $automation->load($automation_id)->delete();
+            $this->automation->load($automation_id)->delete();
             echo json_encode(['success' => 'true', 'msg' => 'Automation successfully deleted!', 'total' => count($collection->load()->getItems())]);
             die;
         }
@@ -72,24 +83,13 @@ class AutomationPost extends Action
         $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
         $category_id = (empty($data['category'])) ? '' : $data['category'];
         $action = (empty($data['action'])) ? '' : $data['action'];
-        $cycle_day = (isset($data['gr_autoresponder']) && true == $data['gr_autoresponder']) ? (int)$data['cycle_day'] : '';
+        $cycle_day = (isset($data['gr_autoresponder']) && 'true' == $data['gr_autoresponder'] && isset($data['cycle_day']) && $data['cycle_day'] != '') ? (int)$data['cycle_day'] : '';
 
         //editing
-        if (isset($data['edit_automation']) && 'true' == $data['edit_automation'] ) {
-            $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
+        if (isset($data['edit_automation']) && 'true' == $data['edit_automation']) {
             $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
-            $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
 
-            $automations_count = $automation->getCollection()
-                ->addFieldToFilter('id_shop', $storeId)
-                ->addFieldToFilter('category_id', $category_id);
-
-            if (count($automations_count) > 0) {
-                echo json_encode(['success' => 'false', 'msg' => 'Automation has not been edited. Rule for chosen category already exist.']);
-                die;
-            }
-
-            $automation->load($automation_id)
+            $this->automation->load($automation_id)
                 ->setCategoryId($category_id)
                 ->setCampaignId($campaign_id)
                 ->setCycleDay($cycle_day)
@@ -108,10 +108,8 @@ class AutomationPost extends Action
             die;
         }
 
-        $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
-
-        $automations_count = $automation->getCollection()
-            ->addFieldToFilter('id_shop', $storeId)
+        $automations_count = $this->automation->getCollection()
+            ->addFieldToFilter('id_shop', $this->storeId)
             ->addFieldToFilter('category_id', $category_id);
 
         if (count($automations_count) > 0) {
@@ -119,7 +117,7 @@ class AutomationPost extends Action
             die;
         }
 
-        $automation->setIdShop($storeId)
+        $this->automation->setIdShop($this->storeId)
             ->setCategoryId($category_id)
             ->setCampaignId($campaign_id)
             ->setActive(1)
@@ -127,7 +125,7 @@ class AutomationPost extends Action
             ->setAction($action)
             ->save();
 
-        $data['id'] = $automation->getId();
+        $data['id'] = $this->automation->getId();
         $data['cycle_day'] = !empty($cycle_day) ? $cycle_day : 'Not set';
 
         echo json_encode(['success' => 'true', 'msg' => 'New automation rule has been created!', 'data' => $data]);
