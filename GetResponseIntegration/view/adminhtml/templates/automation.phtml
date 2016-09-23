@@ -69,35 +69,35 @@ $automations = $block->getAutomations()->getData();
 </button>
 
 <div id="automations-table" class="admin__data-grid-wrap" data-role="grid-wrapper">
-    <table class="data-grid data-grid-draggable" data-role="grid" id="automation_table" style="<?php if (empty($automations)) { ?>display: none; <?php } ?>">
+    <table class="data-grid" id="automation_table" style="<?php if (empty($automations)) { ?>display: none; <?php } ?>">
         <thead>
         <tr>
             <th class="data-grid-th" style="text-align:center; display: none">
-                <span class="data-grid-cell-content" data-bind="text: label">ID</span>
+                <span class="data-grid-cell-content">ID</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Category</span>
+                <span class="data-grid-cell-content">Category</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Campaign</span>
+                <span class="data-grid-cell-content">Campaign</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Cycle Day</span>
+                <span class="data-grid-cell-content">Cycle Day</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Rule</span>
+                <span class="data-grid-cell-content">Rule</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Status</span>
+                <span class="data-grid-cell-content">Status</span>
             </th>
 
             <th class="data-grid-th">
-                <span class="data-grid-cell-content" data-bind="text: label">Actions</span>
+                <span class="data-grid-cell-content">Actions</span>
             </th>
         </tr>
         </thead>
@@ -127,6 +127,7 @@ $automations = $block->getAutomations()->getData();
                 ?>
                 <td style="text-align: center;">
                     <div class="onoffswitch">
+                        <label for="<?php echo 'myonoffswitch' . $automation['id'];?>"></label>
                         <input type="checkbox" onclick="changeRuleStatus('<?php echo $automation['id'];?>')" name="onoffswitch" class="onoffswitch-checkbox" id="<?php echo 'myonoffswitch' . $automation['id'];?>" <?php if ($automation['active']) echo 'checked="checked"'; ?>>
                         <span id="<?php echo 'spinner' . $automation['id'];?>" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="<?php echo $block->getViewFileUrl('GetResponse_GetResponseIntegration::images/ajax-loader-small.gif'); ?>" /></span>
                         <div style="top:0px;margin-left:6px;" id="<?php echo 'message' . $automation['id'];?>"></div>
@@ -156,99 +157,6 @@ $automations = $block->getAutomations()->getData();
 </div>
 
 <?php include 'automation_modal.phtml'; ?>
-
-<form id="edit_automation" method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/automationpost'); ?>" style="display:none;">
-    <?php echo $block->getBlockHtml('formkey'); ?>
-    <input name="edit_automation" id="edit_automation" type="hidden" value="true">
-    <table class="config admin__scope-old">
-        <tbody>
-        <tr>
-            <td style="display: none;">
-                <p class="note">
-                    <span>
-                        ID
-                    </span>
-                </p>
-                <input name="automation_id" id="automation_id" type="text" value="10" style="width:50px;margin-right: 20px;" readonly="readonly" />
-            </td>
-            <td>
-                <p class="note">
-                    <span>
-                        If customers buy in the category
-                    </span>
-                </p>
-                <select name="category" id="category" style="margin-right: 50px;">
-                    <?php
-                    foreach ($categories as $category) {
-                        echo '<option value="' . $category->getEntityId() . '">' . $category->getName() . '</option>';
-                        $block->getSubcategories($category);
-                    }
-                    ?>
-                </select>
-            </td>
-            <td>
-                <p class="note">
-                    <span>
-                        they are
-                    </span>
-                </p>
-                <select name="action" id="action" style="margin-right: 50px;">
-                    <option value="move">moved</option>
-                    <option value="copy">copied</option>
-                </select>
-            </td>
-            <td>
-                <p class="note">
-                    <span>
-                        into the campaign
-                    </span>
-                </p>
-                <select name="campaign_id_edit" id="campaign_id_edit" style="margin-right: 50px;">
-                    <?php
-                    if (count($campaigns) > 0) {
-                        foreach ($campaigns as $campaign) {
-                            echo '<option value="' . $campaign->campaignId . '">' . $campaign->name . '</option>';
-                        }
-                    }
-                    ?>
-                </select>
-            </td>
-            <td>
-                <p class="note">
-                    <span>
-                        Add into the cycle on day
-                    </span>
-                </p>
-                <input
-                    class="GR_checkbox"
-                    type="checkbox"
-                    name="gr_autoresponder"
-                    id="gr_autoresponder"
-                    value="1"
-                    <?php
-                    if (isset($automation['cycle_day']) && $automation['cycle_day'] != '0') {
-                        echo ' checked="checked"';
-                    }
-                    ?>
-                />
-                <select name="cycle_day_edit" id="cycle_day_edit">
-                    <option value="">Choose cycle day</option>
-                </select>
-            </td>
-            </tr>
-        </tbody>
-    </table>
-    <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;">
-        <span class="ui-button-text">
-            <span>Save</span>
-        </span>
-    </button>
-    <button id="cancel_edit" title="Cacnel" type="submit" class="action-default scalable save ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="margin-top: 20px;>
-        <span class="ui-button-text">
-            <span>Cancel</span>
-        </span>
-    </button>
-</form>
 
 <div id="popup-delete" style="display: none;">
     <div>These rule will be permanently deleted. Are you sure?</div>
@@ -336,7 +244,7 @@ $automations = $block->getAutomations()->getData();
                     jQuery('#myonoffswitch' + automation_id).prop('checked', !enable);
                 }
             },
-            error: function(data) {
+            error: function() {
                 jQuery('#message' + automation_id).show().html('<span style="color:red; padding-left: 10px;min-width:200px;">Error</span>');
                 setTimeout(function() {
                     jQuery('#message' + automation_id).fadeOut('slow');
@@ -402,7 +310,7 @@ $automations = $block->getAutomations()->getData();
                                             jQuery('#automation_table').hide();
                                         }
                                     },
-                                    error: function (data) {
+                                    error: function () {
                                     },
                                     complete: function() {
                                         jQuery('#spinner_delete' + automation_id).hide();

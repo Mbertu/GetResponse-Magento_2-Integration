@@ -69,6 +69,7 @@
 
             <tr>
                 <td class="label">
+                    <label for="gr_autoresponder"></label>
                 </td>
                 <td class="value">
                     <input
@@ -89,6 +90,7 @@
                     <span class="cycle_day">
                         <select name="cycle_day" id="cycle_day" disabled="disabled">
                         </select>
+                        <label for="cycle_day"></label>
                     </span>
                     <p class="note">
                     <span>
@@ -130,16 +132,16 @@
         + '<div class="onoffswitch" style="text-align: center;">'
         + '<input type="checkbox" onclick="changeRuleStatus(\''+data.id+'\')" "onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch' + data.id + '" checked="checked">'
         + '<span id="spinner' + data.id + '" style="top:2px;margin-left:6px;width:16px;display:none;"><img src="' + loaderSmall + '" /></span>'
-        + '<div style="top:0px;margin-left:6px;" id="message' + data.id + '"></div>'
+        + '<div style="top:0;margin-left:6px;" id="message' + data.id + '"></div>'
         + '</div>'
         + '</td>'
         + '<td>'
-        + '<button data-id="' + data.id + '" onclick="confirmationOpened(\'edit\','+data.id+')" title="Edit rule" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<button data-id="' + data.id + '" onclick="confirmationOpened(\'edit\','+data.id+')" title="Edit rule" type="submit" class="toggle_button primary edit_automation_button" role="button" aria-disabled="false" style="padding: 0 15px; height: 20px;">'
         + '<span class="ui-button-text">'
         + '<span>Edit</span>'
         + '</span>'
         + '</button> '
-        + '<button data-id="' + data.id + '" onclick="deleteOpened('+data.id+')" title="Delete rule" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0px 15px; height: 20px;">'
+        + '<button data-id="' + data.id + '" onclick="deleteOpened('+data.id+')" title="Delete rule" type="submit" class="toggle_button primary delete_automation_button" role="button" aria-disabled="false" style="padding: 0 15px; height: 20px;">'
         + '<span class="ui-button-text">'
         + '<span>Delete</span>'
         + '</span>'

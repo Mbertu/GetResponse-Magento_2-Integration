@@ -55,6 +55,8 @@ class AutomationPost extends Action
             die;
         }
 
+        $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+
         // Deleting automation
         if (isset($data['delete_automation']) && 'true' == $data['delete_automation']) {
             $automation_id = $data['automation_id'];
@@ -77,6 +79,16 @@ class AutomationPost extends Action
             $campaign_id = (empty($data['campaign_id'])) ? '' : $data['campaign_id'];
             $automation_id = (empty($data['automation_id'])) ? '' : $data['automation_id'];
             $automation = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Automation');
+
+            $automations_count = $automation->getCollection()
+                ->addFieldToFilter('id_shop', $storeId)
+                ->addFieldToFilter('category_id', $category_id);
+
+            if (count($automations_count) > 0) {
+                echo json_encode(['success' => 'false', 'msg' => 'Automation has not been edited. Rule for chosen category already exist.']);
+                die;
+            }
+
             $automation->load($automation_id)
                 ->setCategoryId($category_id)
                 ->setCampaignId($campaign_id)
@@ -95,7 +107,7 @@ class AutomationPost extends Action
             echo json_encode(['success' => 'false', 'msg' => 'You need to choose a campaign and category!']);
             die;
         }
-        $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
+
         $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
 
         $automations_count = $automation->getCollection()

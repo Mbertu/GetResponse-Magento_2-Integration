@@ -172,12 +172,8 @@ $confirmation_bodies = $block->getSubscriptionConfirmationsBody($lang);
                                                 add_campaign_rows.hide('slow');
                                                 jQuery('#campaign_id').append('<option value="' + json.campaignId + '" selected="selected">' + json.name + '</option>');
                                                 popop_modal.find('#new_campaign_message').html('');
-//                                                setTimeout(function() {
-                                                    $('#popup-mpdal').modal('closeModal');
-//                                                    popop_modal.find('#success_message_new_campaign').fadeOut('slow');
-//                                                    popop_modal.find('#new_campaign_message').html('');
-//                                                }, 1500);
-//                                            }
+                                                $('#popup-mpdal').modal('closeModal');
+                                            }
                                         },
                                         error: function (data) {
                                             popop_modal.find('#new_campaign_message').html('<span style="color:red;">An error occured</span>');
