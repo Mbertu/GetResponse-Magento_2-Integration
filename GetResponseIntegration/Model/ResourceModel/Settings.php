@@ -1,13 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:41
- */
 namespace GetResponse\GetResponseIntegration\Model\ResourceModel;
 
-class Settings extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb {
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
+
+/**
+ * Class Settings
+ * @package GetResponse\GetResponseIntegration\Model\ResourceModel
+ */
+class Settings extends AbstractDb
+{
     protected function _construct()
     {
         $this->_init('getresponse_settings', 'id');

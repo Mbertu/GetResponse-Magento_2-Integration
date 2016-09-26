@@ -8,7 +8,7 @@
 <?php
 $webform = $block->getWebformSettings();
 
-if ($webform['active_subscription'] == 1 && $webform['sidebar'] == 'div.sidebar.additional') {
+if (isset($webform['active_subscription']) && $webform['active_subscription'] == 1 && $webform['sidebar'] == 'div.sidebar.additional') {
     echo '<script type="text/javascript" src="' . $webform['url'] .'"></script>';
 }
 ?>

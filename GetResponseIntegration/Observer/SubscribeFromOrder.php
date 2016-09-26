@@ -1,35 +1,33 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mzubrzycki
- * Date: 16/12/15
- * Time: 09:27
- */
-
 namespace GetResponse\GetResponseIntegration\Observer;
 
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Framework\ObjectManagerInterface;
 
+/**
+ * Class SubscribeFromOrder
+ * @package GetResponse\GetResponseIntegration\Observer
+ */
 class SubscribeFromOrder implements ObserverInterface
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
     protected $all_custom_fields;
 
+    /** @var GetResponseAPI3 */
     public $grApi;
+
     /**
      * Constructor
      *
-     * @param \Magento\Framework\ObjectManagerInterface $objectManager
+     * @param ObjectManagerInterface $objectManager
      */
-    public function __construct(
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    public function __construct(ObjectManagerInterface $objectManager) {
         $this->_objectManager = $objectManager;
     }
 
@@ -89,8 +87,7 @@ class SubscribeFromOrder implements ObserverInterface
         $subscriber->loadByEmail($customer->getEmail());
 
         if ($subscriber->isSubscribed() == true) {
-            $api_key = $block->getApiKey();
-            $this->grApi = new GetResponseAPI3($api_key);
+            $this->grApi = $block->getClient();
 
             $this->all_custom_fields = $this->getCustomFields();
 
@@ -115,7 +112,8 @@ class SubscribeFromOrder implements ObserverInterface
                     $product = $this->_objectManager->create('Magento\Catalog\Model\Product')->load($product_id);
                     $product_categories = $product->getCategoryIds();
 
-                    if ($category = array_intersect($product_categories, $automations_categories)) {
+                    $category = array_intersect($product_categories, $automations_categories);
+                    if ($category) {
                         foreach ($category as $c) {
                             if ($category_ids[$c]['action'] == 'move') {
                                 $move_subscriber = true;
@@ -125,12 +123,12 @@ class SubscribeFromOrder implements ObserverInterface
                     }
                 }
                 if ($move_subscriber) {
-                    $results = (array) $this->grApi->getContacts(array(
-                        'query' => array(
+                    $results = (array) $this->grApi->getContacts([
+                        'query' => [
                             'email'      => $customer->getEmail(),
                             'campaignId' => $settings['campaign_id']
-                        )
-                    ));
+                        ]
+                    ]);
                     $contact = array_pop($results);
                     if (!empty($contact) && isset($contact->contactId)) {
                         $this->grApi->deleteContact($contact->contactId);
@@ -159,27 +157,27 @@ class SubscribeFromOrder implements ObserverInterface
      *
      * @return mixed
      */
-    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = array())
+    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = [])
     {
         $name = trim($firstname) . ' ' . trim($lastname);
 
-        $params = array(
+        $params = [
             'name'       => $name,
             'email'      => $email,
-            'campaign'   => array('campaignId' => $campaign),
+            'campaign'   => ['campaignId' => $campaign],
             'ipAddress'  => $_SERVER['REMOTE_ADDR']
-        );
+        ];
 
         if (!empty($cycle_day)) {
             $params['dayOfCycle'] = (int) $cycle_day;
         }
 
-        $results = (array) $this->grApi->getContacts(array(
-            'query' => array(
+        $results = (array) $this->grApi->getContacts([
+            'query' => [
                 'email'      => $email,
                 'campaignId' => $campaign
-            )
-        ));
+            ]
+        ]);
 
         $contact = array_pop($results);
 
@@ -207,20 +205,20 @@ class SubscribeFromOrder implements ObserverInterface
      */
     public function mergeUserCustoms($results, $user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (is_array($results)) {
             foreach ($results as $customs) {
                 $value = $customs->value;
                 if (in_array($customs->name, array_keys($user_customs))) {
-                    $value = array($user_customs[$customs->name]);
+                    $value = [$user_customs[$customs->name]];
                     unset($user_customs[$customs->name]);
                 }
 
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $customs->customFieldId,
                     'value'         => $value
-                );
+                ];
             }
         }
 
@@ -235,7 +233,7 @@ class SubscribeFromOrder implements ObserverInterface
      */
     public function setCustoms($user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (empty($user_customs)) {
             return $custom_fields;
@@ -244,23 +242,23 @@ class SubscribeFromOrder implements ObserverInterface
         foreach ($user_customs as $name => $value) {
             // if custom field is already created on gr account set new value
             if (in_array($name, array_keys($this->all_custom_fields))) {
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $this->all_custom_fields[$name],
-                    'value'         => array($value)
-                );
+                    'value'         => [$value]
+                ];
             } else {
-                $custom = $this->grApi->addCustomField(array(
+                $custom = $this->grApi->addCustomField([
                     'name'   => $name,
                     'type'   => "text",
                     'hidden' => "false",
-                    'values' => array($value),
-                ));
+                    'values' => [$value],
+                ]);
 
                 if (!empty($custom) && !empty($custom->customFieldId)) {
-                    $custom_fields[] = array(
+                    $custom_fields[] = [
                         'customFieldId' => $custom->customFieldId,
-                        'value'         => array($value)
-                    );
+                        'value'         => [$value]
+                    ];
                 }
             }
         }
@@ -274,7 +272,7 @@ class SubscribeFromOrder implements ObserverInterface
      */
     public function getCustomFields()
     {
-        $all_customs = array();
+        $all_customs = [];
         $results     = $this->grApi->getCustomFields();
         if (!empty($results)) {
             foreach ($results as $ac) {

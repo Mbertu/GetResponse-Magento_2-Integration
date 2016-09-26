@@ -1,16 +1,22 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Export;
 
+use GetResponse\GetResponseIntegration\Block\Settings;
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
-use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
-class Process extends \Magento\Backend\App\Action
+/**
+ * Class Process
+ * @package GetResponse\GetResponseIntegration\Controller\Adminhtml\Export
+ */
+class Process extends Action
 {
     protected $resultPageFactory;
     protected $all_custom_fields;
 
+    /** @var GetResponseAPI3 */
     public $grApi;
 
     public $stats = [
@@ -20,23 +26,32 @@ class Process extends \Magento\Backend\App\Action
         'error'      => 0
     ];
 
+    /**
+     * Process constructor.
+     * @param Context $context
+     * @param PageFactory $resultPageFactory
+     */
     public function __construct(Context $context, PageFactory $resultPageFactory)
     {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
     }
 
+    /**
+     * @return \Magento\Framework\View\Result\Page
+     */
     public function execute()
     {
+        /** @var Settings $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $data = $this->getRequest()->getPostValue();
 
         $campaign = $data['campaign_id'];
         if (empty($campaign)) {
-            $this->messageManager->addError('You need to choose a campaign!');
+            $this->messageManager->addErrorMessage('You need to choose a campaign!');
             $resultPage = $this->resultPageFactory->create();
             $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-            $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+            $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
             return $resultPage;
         }
@@ -46,11 +61,11 @@ class Process extends \Magento\Backend\App\Action
 
             foreach ($customs as $field => $name) {
                 if (false == preg_match('/^[_a-zA-Z0-9]{2,32}$/m', $name)) {
-                    $this->messageManager->addError('There is a problem with one of your custom field name! Field name
+                    $this->messageManager->addErrorMessage('There is a problem with one of your custom field name! Field name
                     must be composed using up to 32 characters, only a-z (lower case), numbers and "_".');
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-                    $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+                    $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
                     return $resultPage;
                 }
@@ -60,9 +75,7 @@ class Process extends \Magento\Backend\App\Action
         }
 
         $customers = $block->getCustomers();
-
-        $api_key = $block->getApiKey();
-        $this->grApi = new GetResponseAPI3($api_key);
+        $this->grApi = $block->getClient();
 
         $this->all_custom_fields = $this->getCustomFields();
 
@@ -77,25 +90,20 @@ class Process extends \Magento\Backend\App\Action
             }
             $custom_fields['ref'] = 'Magento2 GetResponse Integration Plugin';
 
-            if ($data['gr_autoresponder'] == 1 && $data['cycle_day'] != '') {
+            if (isset($data['gr_autoresponder']) && $data['cycle_day'] != '') {
                 $cycle_day = (int) $data['cycle_day'];
             } else {
-                $cycle_day = null;
+                $cycle_day = 0;
             }
 
-            $response = $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
+            $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
         }
 
-        $this->messageManager->addSuccess(
-            'Contacts export process has completed (' .
-            'created: ' . $this->stats['added'] .
-            ', updated: ' . $this->stats['updated'] .
-            ', not added: ' . $this->stats['error'] . ')'
-        );
+        $this->messageManager->addSuccessMessage('Contacts export process has completed.');
 
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('GetResponse_GetResponseIntegration::export');
-        $resultPage->getConfig()->getTitle()->prepend('Export customers to GetResponse');
+        $resultPage->getConfig()->getTitle()->prepend('Export customer data on demand');
 
         return $resultPage;
     }
@@ -113,27 +121,27 @@ class Process extends \Magento\Backend\App\Action
      *
      * @return mixed
      */
-    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = array())
+    public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = [])
     {
         $name = trim($firstname) . ' ' . trim($lastname);
 
-        $params = array(
+        $params = [
             'name'       => $name,
             'email'      => $email,
-            'campaign'   => array('campaignId' => $campaign),
+            'campaign'   => ['campaignId' => $campaign],
             'ipAddress'  => $_SERVER['REMOTE_ADDR']
-        );
+        ];
 
         if (!empty($cycle_day)) {
             $params['dayOfCycle'] = (int) $cycle_day;
         }
 
-        $results = (array) $this->grApi->getContacts(array(
-            'query' => array(
+        $results = (array) $this->grApi->getContacts([
+            'query' => [
                 'email'      => $email,
                 'campaignId' => $campaign
-            )
-        ));
+            ]
+        ]);
 
         $contact = array_pop($results);
 
@@ -173,20 +181,20 @@ class Process extends \Magento\Backend\App\Action
      */
     public function mergeUserCustoms($results, $user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (is_array($results)) {
             foreach ($results as $customs) {
                 $value = $customs->value;
                 if (in_array($customs->name, array_keys($user_customs))) {
-                    $value = array($user_customs[$customs->name]);
+                    $value = [$user_customs[$customs->name]];
                     unset($user_customs[$customs->name]);
                 }
 
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $customs->customFieldId,
                     'value'         => $value
-                );
+                ];
             }
         }
 
@@ -201,7 +209,7 @@ class Process extends \Magento\Backend\App\Action
      */
     public function setCustoms($user_customs)
     {
-        $custom_fields = array();
+        $custom_fields = [];
 
         if (empty($user_customs)) {
             return $custom_fields;
@@ -210,23 +218,23 @@ class Process extends \Magento\Backend\App\Action
         foreach ($user_customs as $name => $value) {
             // if custom field is already created on gr account set new value
             if (in_array($name, array_keys($this->all_custom_fields))) {
-                $custom_fields[] = array(
+                $custom_fields[] = [
                     'customFieldId' => $this->all_custom_fields[$name],
-                    'value'         => array($value)
-                );
+                    'value'         => [$value]
+                ];
             } else {
-                $custom = $this->grApi->addCustomField(array(
+                $custom = $this->grApi->addCustomField([
                     'name'   => $name,
                     'type'   => "text",
                     'hidden' => "false",
-                    'values' => array($value),
-                ));
+                    'values' => [$value],
+                ]);
 
                 if (!empty($custom) && !empty($custom->customFieldId)) {
-                    $custom_fields[] = array(
+                    $custom_fields[] = [
                         'customFieldId' => $custom->customFieldId,
-                        'value'         => array($value)
-                    );
+                        'value'         => [$value]
+                    ];
                 }
             }
         }
@@ -240,7 +248,7 @@ class Process extends \Magento\Backend\App\Action
      */
     public function getCustomFields()
     {
-        $all_customs = array();
+        $all_customs = [];
         $results     = $this->grApi->getCustomFields();
         if (!empty($results)) {
             foreach ($results as $ac) {

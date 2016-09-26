@@ -1,6 +1,7 @@
-<?php /** @var $block \GetResponse\GetResponseIntegration\Block\Settings */?>
 <?php
+/** @var $block \GetResponse\GetResponseIntegration\Block\Settings */
 $isApiActive = $block->checkApiKey();
+$settings = $block->getSettings();
 ?>
 <style>
     .label {
@@ -31,21 +32,18 @@ $isApiActive = $block->checkApiKey();
     }
 </style>
 <?php if (!$isApiActive) { ?>
-    <p>
-        Enter your API key. You can find it on your GetResponse profile in
-    <a href="https://app.getresponse.com/manage_api.html">Account Details -> GetResponse API.</a></p>
+    <h2>Connect GetResponse account</h2>
 <?php } ?>
 <div class="accordion">
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/settings/save'); ?>">
     <?php echo $block->getBlockHtml('formkey'); ?>
-    <div class="config admin__scope-old">
-    <table>
+    <table class="config admin__scope-old">
         <tbody>
             <?php if (!$isApiActive) : ?>
                 <tr>
                     <td class="label">
-                        <label for="getresponse_api_key" style="padding-top:0px;">
-                            API key
+                        <label for="getresponse_api_key" style="padding-top:0px; width: 90px;">
+                            API Key
                         </label>
                     </td>
                     <td class="value">
@@ -54,29 +52,76 @@ $isApiActive = $block->checkApiKey();
                                class="input-text admin__control-text">
                         <p class="note">
                             <span>
-                                If you already are a GetResponse customer, please enter your API key to enable
-                                the module and click "Save" to continue.
+                                You can find your API key in integration settings of your GetResponse account. Log in to GetResponse and go to <a href="https://app.getresponse.com/manage_api.html" target="_blank">My account > API & OAuth</a> to find the key.
                             </span>
                         </p>
                     </td>
                 </tr>
+                <tr>
+                    <td class="label">
+                        <label for="getresponse_360_account" style="padding-top:0px;"></label>
+                    </td>
+                    <td class="value">
+                        <input
+                            class="GR_checkbox"
+                            type="checkbox"
+                            name="getresponse_360_account"
+                            id="getresponse_360_account"
+                            value="1"
+                            <?php if ($block->getLastPostedApiAccount()) { ?>checked="checked"<?php } ?>
+                        />
+                        <span>I've purchased the Enterprise plan</span>
+                    </td>
+                </tr>
+
+                <tr class="getresponse_360_account_options" <?php if (1 != $block->getLastPostedApiAccount()) { ?>style="display: none;"<?php } ?>>
+                    <td class="label">
+                        <label for="getresponse_api_url" style="margin-top: 7px;">Account type</label>
+                    </td>
+                    <td class="value">
+                        <select name="getresponse_api_url" id="getresponse_api_url">
+                            <option value="https://api3.getresponse360.pl/v3" <?php if('https://api3.getresponse360.pl/v3' == $block->getLastPostedApiUrl()) { ?> selected="selected"<?php } ?>>GetResponse360 PL</option>
+                            <option value="https://api3.getresponse360.com/v3" <?php if('https://api3.getresponse360.com/v3' == $block->getLastPostedApiUrl()) { ?> selected="selected"<?php } ?>>GetResponse360 COM</option>
+                        </select>
+                        <p class="note">
+                            <span>
+                                Please select GetResponse account type.
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="getresponse_360_account_options" <?php if (1 != $block->getLastPostedApiAccount()) { ?>style="display: none;"<?php } ?>>
+                    <td class="label"">
+                        <label for="getresponse_api_domain" style="padding-top:0px;">
+                            Your domain
+                        </label>
+                    </td>
+                    <td class="value">
+                        <input type="text" name="getresponse_api_domain" id="getresponse_api_domain"
+                               value="<?php echo $block->getLastPostedApiDomain();?>"
+                               class="input-text admin__control-text">
+                        <p class="note">
+                            <span>
+                                Enter your domain without protocol https:// eg: "yourdomainname.com"
+                            </span>
+                        </p>
+                    </td>
+                </tr>
+
             <?php else : ?>
                 <tr>
                     <td class="label">
                         <label for="getresponse_getresponseintegration_general_api_key">Status</label>
                     </td>
                     <td class="value">
-                        <div style="background: #43C03A; color: white; padding: 5px 10px;" >CONNECTED</div>
-                        <p class="note">
-                            <span>
-                                You are connected to GetResponse account. (<a href="<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>">Disconnect</a>)
-                            </span>
-                        </p>
+<!--                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="--><?php //echo $block->getUrl('getresponseintegration/settings/delete'); ?><!--">disconnect</a>)</div>-->
+                        <div><span style="background: #43C03A; color: white; padding: 5px 10px;">CONNECTED</span> (<a href="#" id="getresponse_disconnect" data-bind="click: confirmationOpened">disconnect</a>)</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="label">
-                        API key
+                        API Key
                     </td>
                     <td class="value">
                         <span name="getresponse_api_key" id="getresponse_api_key"><?php echo $block->getApiKey(); ?></span>
@@ -116,13 +161,66 @@ $isApiActive = $block->checkApiKey();
         ?>
         </tbody>
     </table>
-    </div>
+    <br/>
     <?php if (!$isApiActive) : ?>
     <button id="save" title="Save" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
         <span class="ui-button-text">
-            <span>Save</span>
+            <span>Connect</span>
         </span>
     </button>
     <?php endif; ?>
 </form>
+
+<div id="popup-mpdal" style="display: none;">
+    <div> This stops new subscriptions via forms, comments, or during account registration. </div>
+</div>
+
+<script type="text/javascript">
+    var mx_account = jQuery('#getresponse_360_account'), mx_options = jQuery('.getresponse_360_account_options');
+    if (mx_account.prop('checked') == true) {
+        mx_options.show();
+    }
+    mx_account.change(function () {
+        mx_options.toggle('slow');
+    });
+
+    function confirmationOpened() {
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function($, modal) {
+                var url = '<?php echo $block->getUrl('getresponseintegration/settings/delete'); ?>';
+                var options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: true,
+                    title: 'Are you sure you want to disconnect from GetResponse?',
+                    buttons: [
+                        {
+                            text: $.mage.__('Yes, disconnect'),
+                            class: 'action-secondary action-dismiss',
+                            click: function () {
+                                window.location.href = url;
+                                return false;
+                            }
+                        },
+                        {
+                            text: $.mage.__('Stay connected'),
+                            class: 'action-primary action-accept',
+                            click: function () {
+                                this.closeModal();
+                            }
+                        }
+                    ]
+                };
+
+                var popup = modal(options, $('#popup-mpdal'));
+                $('#popup-mpdal').modal('openModal');
+            }
+        );
+    }
+</script>
+
 </div>

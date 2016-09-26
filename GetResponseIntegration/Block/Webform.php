@@ -1,25 +1,37 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Block;
 
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 
-
-class Webform extends \Magento\Framework\View\Element\Template
+/**
+ * Class Webform
+ * @package GetResponse\GetResponseIntegration\Block
+ */
+class Webform extends Template
 {
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        array $data = [],
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    /**
+     * Webform constructor.
+     * @param Context $context
+     * @param array $data
+     * @param ObjectManagerInterface $objectManager
+     */
+    public function __construct(Context $context, array $data = [], ObjectManagerInterface $objectManager)
+    {
         parent::__construct($context, $data);
 
         $this->_objectManager = $objectManager;
     }
 
+    /**
+     * @return mixed
+     */
     public function getWebformSettings()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();

@@ -44,8 +44,9 @@ $settings = $block->getWebformSettings();
 
 <div>
     <p>
-        You can now add your GetResponse web forms to your Magento store. Simply pick one of the web forms you’ve
-        created at GetResponse and choose the location to insert the web form.
+        You can add your GetResponse forms or exit popups to your store. Pick one of the forms you’ve created at
+        GetResponse. Choose the layout and block positions to insert the form. Note that your visitors can see the
+        block title you enter on this page.
     </p>
 </div>
 
@@ -54,19 +55,23 @@ $settings = $block->getWebformSettings();
         <table class="config admin__scope-old">
             <tbody>
             <tr>
-                <td class="label" style="width:200px;">
-                    <label for="publish" style="margin-top: 7px;">Publish</label>
+                <td class="label" style="width:250px;">
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="publish"
+                        id="publish"
+                        value="1"
+                        <?php
+                        if (isset($settings['active_subscription']) && $settings['active_subscription'] == 1) {
+                            echo ' checked="checked"';
+                        }
+                        ?>
+                    />
+                    <label for="publish" style="margin-top: 7px;">Allow subscriptions via forms</label>
                 </td>
                 <td class="value">
-                    <select name="publish" id="publish">
-                        <option value="0">Off</option>
-                        <option value="1"<?php if (isset($settings['active_subscription']) && $settings['active_subscription'] == 1): ?> selected="selected"<?php endif; ?>>On</option>
-                    </select>
-                    <p class="note">
-                    <span>
-                        Select if you want to publish your webform in magento.
-                    </span>
-                    </p>
+
                 </td>
             </tr>
 
@@ -78,7 +83,7 @@ $settings = $block->getWebformSettings();
                 ?>
             >
                 <td class="label">
-                    <label for="webform_id" style="margin-top: 7px;">Web Form:</label>
+                    <label for="webform_id" style="margin-top: 7px;">Select your form:</label>
                 </td>
                 <td class="value">
                     <select name="webform_id" id="webform_id">
@@ -123,7 +128,7 @@ $settings = $block->getWebformSettings();
                 ?>
             >
                 <td class="label">
-                    <label for="sidebar" style="margin-top: 7px;">Web Form position:</label>
+                    <label for="sidebar" style="margin-top: 7px;">Select the block position:</label>
                 </td>
                 <td class="value">
                     <select name="sidebar">
@@ -145,11 +150,14 @@ $settings = $block->getWebformSettings();
 
             </tbody>
         </table>
-    <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
-        <span class="ui-button-text">
-            <span>Save settings</span>
-        </span>
-    </button>
+
+        <br/>
+
+        <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
+            <span class="ui-button-text">
+                <span>Save subscription settings</span>
+            </span>
+        </button>
 </form>
 
 <script>

@@ -11,14 +11,23 @@ $settings = $block->getSettings();
 $autoresponders = $block->getAutoresponders();
 ?>
 
-<p>This option enables one-time export of contacts from your Magento account to GetResponse. Choose a target
-    campaign to which your contacts will be exported. If the campaign includes autoresponders select the sequence day
-    to add your contacts to. You can also create a new campaign for your Magento contacts by clicking "Add new
-    campaign". If you want to include visitors who subscribed via Magento web form module, check "Web form
-    subscription" option.
+<p>
+    You can export your customer information from Magento to your GetResponse account. This option is useful for one
+    time export of existing customers. Choose the campaign where you want to export your contacts. You can also create
+    a new campaign for the Magento contacts by clicking "Add new campaign". Select if you want to update specific fields.
+    When this option is off only new contacts are exported.
 </p>
-<p><strong>Please note: Each costumers export will include all of your entries from Magento database.</strong></p>
-<div>You have <?php echo count($customers); echo (count($customers) == 1) ? ' customer' : ' customers' ?>.</div>
+
+<div id="messages">
+    <div class="messages">
+        <div class="message message-notice notice">
+            <div data-ui-id="messages-message-notice">
+                Each customer export includes all entries from your Magento database.
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <style>
     .label {
@@ -51,6 +60,10 @@ $autoresponders = $block->getAutoresponders();
     tr {
         margin-bottom: 5px;
     }
+
+    .button-margin {
+        margin-top: 10px;
+    }
 </style>
 
 <form method="post" action="<?php echo $block->getUrl('getresponseintegration/export/process'); ?>" style="margin-top: 20px;">
@@ -58,8 +71,8 @@ $autoresponders = $block->getAutoresponders();
         <table class="config admin__scope-old">
             <tbody>
             <tr>
-                <td class="label" style="width: 200px;">
-                    <label for="campaign_id" style="margin-top: 7px;">Campaign</label>
+                <td class="label" style="width: 215px;">
+                    <label for="campaign_id" style="margin-top: 7px;">Select campaign</label>
                 </td>
                 <td class="value">
                     <select name="campaign_id" id="campaign_id">
@@ -72,73 +85,17 @@ $autoresponders = $block->getAutoresponders();
                         }
                         ?>
                     </select>
-                    <div id="new_campaign_button" title="Add new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="cursor: pointer;">
+                    <div id="getresponse_disconnect" data-bind="click: confirmationOpened" title="Add new campaign" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false" style="cursor: pointer;">
                         <span class="ui-button-text">
                             <span>Add new campaign</span>
                         </span>
                     </div>
-                    <p class="note">
-                    <span>
-                        Please select target campaign.
-                    </span>
-                    </p>
-                </td>
-            </tr>
-
-            <?php include 'new_campaign.phtml'; ?>
-
-            <tr>
-                <td class="label">
-                    <label for="gr_sync_order_data">Update custom fields</label>
-                </td>
-                <td class="value">
-                    <input
-                        class="GR_checkbox"
-                        type="checkbox"
-                        name="gr_sync_order_data"
-                        id="gr_sync_order_data"
-                        value="1"
-                    />
-                    <p class="note">
-                    <span>
-                        Select if you want to export custom fields.
-                    </span>
-                    </p>
-                </td>
-            </tr>
-
-            <tr id="customNameFieldsRow" style="display: none;">
-                <td class="label">
-                    <label style="margin-top:7px;">Custom fields</label>
-                </td>
-                <td class="value">
-                    <div id="customNameFields">
-                        <div class="gr-custom-field">
-                            <select class="jsNarrowSelect" name="gr_custom_fields" multiple="multiple">
-                                <?php
-                                if (!empty($customs)) {
-                                    foreach ($customs as $custom) {
-                                        echo '<option data-inputvalue="' . $custom['custom_name'] . '" value="' . $custom['custom_value'] .
-                                            '" id="' . $custom['custom_value'] . '"', ( $custom['default'] == '1')
-                                            ? ' selected="selected"' : '', $custom['default'] == '1'
-                                            ? ' disabled="disabled"' : '', '>', $custom['custom_field'], '</option>';
-                                    }
-                                }
-                                ?>
-                            </select>
-                        </div>
-                    </div>
-                    <p class="note">
-                    <span>
-                        Choose custom fields you want to update.<br />Custom name must be composed using up to 32 characters, only a-z (lower case), numbers and "_".
-                    </span>
-                    </p>
+                    <p class="note"></p>
                 </td>
             </tr>
 
             <tr>
                 <td class="label">
-                    <label for="gr_autoresponder">Autoresponder sequence</label>
                 </td>
                 <td class="value">
                     <input
@@ -146,44 +103,82 @@ $autoresponders = $block->getAutoresponders();
                         type="checkbox"
                         name="gr_autoresponder"
                         id="gr_autoresponder"
+                        style="margin-bottom: 5px;"
                         value="1"
                     />
-                    <p class="note">
-                    <span>
-                        Select if you want to add customers to autoresponder sequence.
+                    <span>Add to autoresponder sequence</span>
+                    <br/>
+                    <span class="cycle_day">
+                        <select name="cycle_day" id="cycle_day" disabled="disabled">
+                        </select>
                     </span>
-                    </p>
+                    <p class="note"></p>
                 </td>
             </tr>
 
-            <tr class="cycle_day" style="display:none;">
-                <td class="label" style="width: 200px;">
-                    <label for="cycle_day">Day of cycle</label>
+            <tr>
+                <td class="label">
+                    <input
+                        class="GR_checkbox"
+                        type="checkbox"
+                        name="gr_sync_order_data"
+                        id="gr_sync_order_data"
+                        value="1"
+                    />
+                    <label for="gr_sync_order_data">Update contact details</label>
+                    <a class="gr-tooltip" style="display: inline-block;margin: 1px 1px 1px 3px;">
+                        <span class="gr-tip">
+                            <span style="font-weight: normal;">
+                                Select this option if you want to overwrite contact details that already exist in your GetResponse database. Clear this option to keep existing data intact.
+                            </span>
+                        </span>
+                    </a>
                 </td>
-                <td class="value">
-                    <select name="cycle_day" id="cycle_day">
-                        <option value="">Choose cycle day</option>
-                    </select>
-                    <p class="note">
-                    <span>
-                        Please select autoresponder cycle day.
-                    </span>
-                    </p>
-                </td>
+                <td class="value"></td>
             </tr>
 
             </tbody>
         </table>
-    <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false">
-        <span class="ui-button-text">
-            <span>Export</span>
-        </span>
-    </button>
+
+        <div id="customNameFieldsRow" class="forms config admin__scope-old" style="display: none;">
+            <div id="customNameFields">
+                <br/>
+                Copy Magento customer details to custom fields.
+                <br/>
+                <div class="gr-custom-field">
+                    <select class="jsNarrowSelect" name="gr_custom_fields" multiple="multiple">
+                        <?php
+                        if (!empty($customs)) {
+                            foreach ($customs as $custom) {
+                                echo '<option data-inputvalue="' . $custom['custom_name'] . '" value="' . $custom['custom_value'] .
+                                    '" id="' . $custom['custom_value'] . '"', ( $custom['default'] == '1')
+                                    ? ' selected="selected"' : '', $custom['default'] == '1'
+                                    ? ' disabled="disabled"' : '', '>', $custom['custom_field'], '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <p class="note">
+                <span>
+                    Custom name must be composed using up to 32 characters, only a-z (lower case), numbers and "_".
+                </span>
+            </p>
+        </div>
+
+        <button id="export" title="Export" type="submit" class="action-default scalable save primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only button-margin" role="button" aria-disabled="false">
+            <span class="ui-button-text">
+                <span>Export</span>
+            </span>
+        </button>
 </form>
 
-<script>
+<?php include 'new_campaign.phtml'; ?>
+
+<script type="text/javascript">
     var sod = jQuery('#gr_sync_order_data'), cfp = jQuery('#customNameFields'), cfprow = jQuery('#customNameFieldsRow');
-    var cycle_day_checkbox = jQuery('#gr_autoresponder'), campaign_id = jQuery('#campaign_id'), cycle_day = jQuery('#cycle_day');
+    var campaign_id = jQuery('#campaign_id'), cycle_day = jQuery('#cycle_day'), gr_autoresponder = jQuery('#gr_autoresponder');
     if (sod.prop('checked') == true) {
         cfp.show();
     }
@@ -193,13 +188,6 @@ $autoresponders = $block->getAutoresponders();
     jQuery('.jsNarrowSelect').selectNarrowDown();
 
     var autoresponders = <?php echo json_encode($autoresponders); ?>;
-
-    if (cycle_day_checkbox.prop('checked') == true) {
-        jQuery('.cycle_day').show();
-    }
-    cycle_day_checkbox.change(function () {
-        jQuery('.cycle_day').toggle('slow');
-    });
 
     function populateSelectWithAutoresponders() {
         cycle_day.empty();
@@ -212,8 +200,12 @@ $autoresponders = $block->getAutoresponders();
                     + campaign_autoresponders[i]['name']
                     + ' (Subject: ' + campaign_autoresponders[i]['subject'] +')</option>';
             }
+            cycle_day.prop('disabled', false);
+            gr_autoresponder.prop('disabled', false);
         } else {
-            options = '<option value="">No autoresponders for chosen campaign!</option>';
+            options = '<option value="">no autoresponders</option>';
+            cycle_day.prop('disabled', true);
+            gr_autoresponder.prop('disabled', true).prop('checked', false);
         }
         cycle_day.append(options);
     }

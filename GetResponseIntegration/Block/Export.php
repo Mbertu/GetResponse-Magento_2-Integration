@@ -2,42 +2,55 @@
 namespace GetResponse\GetResponseIntegration\Block;
 
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Framework\View\Element\Template\Context;
 
+/**
+ * Class Export
+ * @package GetResponse\GetResponseIntegration\Block
+ */
 class Export extends \Magento\Framework\View\Element\Template
 {
-    /**
-     * @var \Amasty\HelloWorld\Helper\Data
-     */
-    protected $helper;
-
     public $stats;
 
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var ObjectManagerInterface
      */
     protected $_objectManager;
 
-    public function __construct(
-        \Magento\Framework\View\Element\Template\Context $context,
-        \Magento\Framework\ObjectManagerInterface $objectManager
-    ) {
+    /**
+     * Export constructor.
+     * @param Context $context
+     * @param ObjectManagerInterface $objectManager
+     */
+    public function __construct(Context $context, ObjectManagerInterface $objectManager)
+    {
         parent::__construct($context);
 
         $this->_objectManager = $objectManager;
     }
 
+    /**
+     * @return mixed
+     */
     public function getCustomers()
     {
         $customers = $this->_objectManager->get('Magento\Customer\Model\Customer');
         return $customers->getCollection();
     }
 
+    /**
+     * @return mixed
+     */
     public function getActiveCustoms()
     {
         $customs = $this->_objectManager->get('GetResponse\GetResponseIntegration\Model\Customs');
         return $customs->getCollection()->addFieldToFilter('active_custom', true);
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultCustoms()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -45,36 +58,52 @@ class Export extends \Magento\Framework\View\Element\Template
         return $customs->getCollection($storeId, 'id_shop');
     }
 
+    /**
+     * @return mixed
+     */
     public function getCampaigns()
     {
-        $client = new GetResponseAPI3($this->getApiKey());
-        return $client->getCampaigns();
+        return $this->getClient()->getCampaigns(['sort' => ['name' => 'asc']]);
     }
 
+    /**
+     * @param $id
+     * @return mixed
+     */
     public function getCampaign($id)
     {
-        $client = new GetResponseAPI3($this->getApiKey());
-        return $client->getCampaign($id);
+        return $this->getClient()->getCampaign($id);
     }
 
+    /**
+     * @return mixed
+     */
     public function getAccountFromFields()
     {
-        $client = new GetResponseAPI3($this->getApiKey());
-        return $client->getAccountFromFields();
+        return $this->getClient()->getAccountFromFields();
     }
 
+    /**
+     * @param $lang
+     * @return mixed
+     */
     public function getSubscriptionConfirmationsSubject($lang)
     {
-        $client = new GetResponseAPI3($this->getApiKey());
-        return $client->getSubscriptionConfirmationsSubject($lang);
+        return $this->getClient()->getSubscriptionConfirmationsSubject($lang);
     }
 
+    /**
+     * @param $lang
+     * @return mixed
+     */
     public function getSubscriptionConfirmationsBody($lang)
     {
-        $client = new GetResponseAPI3($this->getApiKey());
-        return $client->getSubscriptionConfirmationsBody($lang);
+        return $this->getClient()->getSubscriptionConfirmationsBody($lang);
     }
 
+    /**
+     * @return mixed
+     */
     public function getSettings()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -82,6 +111,9 @@ class Export extends \Magento\Framework\View\Element\Template
         return $settings->load($storeId, 'id_shop')->getData();
     }
 
+    /**
+     * @return mixed
+     */
     public function getAutomations()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
@@ -90,20 +122,23 @@ class Export extends \Magento\Framework\View\Element\Template
             ->addFieldToFilter('id_shop', $storeId);
     }
 
+    /**
+     * @param $category_id
+     * @return mixed
+     */
     public function getCategoryName($category_id)
     {
         $_categoryHelper = $this->_objectManager->get('\Magento\Catalog\Model\Category');
         return $_categoryHelper->load($category_id)->getName();
     }
 
+    /**
+     * @return mixed
+     */
     public function getStoreCategories()
     {
         $_categoryHelper = $this->_objectManager->get('\Magento\Catalog\Helper\Category');
         $categories = $_categoryHelper->getStoreCategories(true, false, true);
-
-//        $categories = $this->_objectManager->get('Magento\Catalog\Model\Category');
-//        $categories = $categories->getCollection()
-//            ->joinAttribute('name','catalog_category/name','entity_id',null,'left');
 
         return $categories;
     }
@@ -127,12 +162,13 @@ class Export extends \Magento\Framework\View\Element\Template
         }
     }
 
+    /**
+     * @return array
+     */
     public function getAutoresponders()
     {
-        $api_key = $api_key = $this->getApiKey();
-        $params = array('query' => array('triggerType' => 'onday', 'status' => 'active'));
-        $client = new GetResponseAPI3($api_key);
-        $result = $client->getAutoresponders($params);
+        $params = ['query' => ['triggerType' => 'onday', 'status' => 'active']];
+        $result = $this->getClient()->getAutoresponders($params);
         $autoresponders = [];
 
         if (!empty($result)) {
@@ -150,19 +186,24 @@ class Export extends \Magento\Framework\View\Element\Template
         return $autoresponders;
     }
 
+    /**
+     * @return mixed
+     */
     public function getStoreLanguage()
     {
         return $this->_scopeConfig->getValue('general/locale/code');
     }
 
+    /**
+     * @return bool|int
+     */
     public function checkApiKey()
     {
-        $api_key = $this->getApiKey();
-        $client = new GetResponseAPI3($api_key);
-        if (empty($api_key)) {
+        if (empty($this->getApiKey())) {
             return 0;
         }
-        $response = $client->ping();
+
+        $response = $this->getClient()->ping();
 
         if (isset($response->accountId)) {
             return true;
@@ -171,10 +212,22 @@ class Export extends \Magento\Framework\View\Element\Template
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getApiKey()
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
         $model = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
         return $model->load($storeId, 'id_shop')->getApiKey();
+    }
+
+    /**
+     * @return GetResponseAPI3
+     */
+    public function getClient()
+    {
+        $settings = $this->getSettings();
+        return new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
     }
 }
