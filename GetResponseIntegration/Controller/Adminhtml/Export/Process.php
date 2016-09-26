@@ -74,6 +74,7 @@ class Process extends Action
             $customs = [];
         }
 
+        // only those that are subscribed to newsletters
         $customers = $block->getCustomers();
         $this->grApi = $block->getClient();
 
@@ -88,13 +89,8 @@ class Process extends Action
                     $custom_fields[$name] = $customer[$field];
                 }
             }
-            $custom_fields['ref'] = 'Magento2 GetResponse Integration Plugin';
-
-            if (isset($data['gr_autoresponder']) && $data['cycle_day'] != '') {
-                $cycle_day = (int) $data['cycle_day'];
-            } else {
-                $cycle_day = 0;
-            }
+            $custom_fields['origin'] = 'magento2';
+            $cycle_day = (isset($data['gr_autoresponder']) && $data['cycle_day'] != '') ? (int) $data['cycle_day'] : 0;
 
             $this->addContact($campaign, $customer['firstname'], $customer['lastname'], $customer['email'], $cycle_day, $custom_fields);
         }

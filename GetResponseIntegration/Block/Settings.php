@@ -41,7 +41,8 @@ class Settings extends Template
                                ->joinAttribute('telephone', 'customer_address/telephone', 'default_billing', null, 'left')
                                ->joinAttribute('country', 'customer_address/country_id', 'default_billing', null, 'left')
                                ->joinAttribute('company', 'customer_address/company', 'default_billing', null, 'left')
-                               ->joinAttribute('birthday', 'customer/dob', 'entity_id', null, 'left');
+                               ->joinAttribute('birthday', 'customer/dob', 'entity_id', null, 'left')
+                               ->joinTable('newsletter_subscriber', 'customer_id=entity_id', ['subscriber_status'], '{{table}}.subscriber_status=1');
         return $customers;
     }
 

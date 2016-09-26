@@ -36,10 +36,10 @@ class Webformpost extends Action
         $data = $this->getRequest()->getPostValue();
 
         if (!empty($data)) {
-            $publish = $data['publish'];
-            $webform_id = $data['webform_id'];
-            $webform_url = $data['webform_url'];
-            $sidebar = $data['sidebar'];
+            $publish = isset($data['publish']) ? $data['publish'] : 0;
+            $webform_id = isset($data['webform_id']) ? $data['webform_id'] : null;
+            $webform_url = isset($data['webform_url']) ? $data['webform_url'] : null;
+            $sidebar = isset($data['sidebar']) ? $data['sidebar'] : null;
             $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
             $webform = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Webform');
 
