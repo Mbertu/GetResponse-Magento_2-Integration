@@ -2,7 +2,7 @@
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
 use GetResponse\GetResponseIntegration\Model\Account;
-use GetResponse\GetResponseIntegration\Model\Automation;
+use GetResponse\GetResponseIntegration\Model\Automation as ModelAutomation;
 use GetResponse\GetResponseIntegration\Model\Settings;
 use GetResponse\GetResponseIntegration\Model\Webform;
 use Magento\Backend\App\Action;
@@ -50,7 +50,7 @@ class Delete extends Action
         $webform = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Webform');
         $webform->load($storeId, 'id_shop')->delete();
 
-        /** @var Automation $automation */
+        /** @var ModelAutomation $automation */
         $automation = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Automation');
         $automations = $automation->getCollection()->addFieldToFilter('id_shop', $storeId);
         foreach ($automations as $automation) {
