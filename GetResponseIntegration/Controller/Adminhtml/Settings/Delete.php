@@ -1,10 +1,10 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
-use GetResponse\GetResponseIntegration\Model\Account;
+use GetResponse\GetResponseIntegration\Model\Account as ModelAccount;
 use GetResponse\GetResponseIntegration\Model\Automation as ModelAutomation;
-use GetResponse\GetResponseIntegration\Model\Settings;
-use GetResponse\GetResponseIntegration\Model\Webform;
+use GetResponse\GetResponseIntegration\Model\Settings as ModelSettings;
+use GetResponse\GetResponseIntegration\Model\Webform as ModelWebform;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -38,15 +38,15 @@ class Delete extends Action
     {
         $storeId = $this->_objectManager->get('Magento\Store\Model\StoreManagerInterface')->getStore()->getId();
 
-        /** @var Settings $settings */
+        /** @var ModelSettings $settings */
         $settings = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Settings');
         $settings->load($storeId, 'id_shop')->delete();
 
-        /** @var Account $account */
+        /** @var ModelAccount $account */
         $account = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Account');
         $account->load($storeId, 'id_shop')->delete();
 
-        /** @var Webform $webform */
+        /** @var ModelWebform $webform */
         $webform = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Webform');
         $webform->load($storeId, 'id_shop')->delete();
 
