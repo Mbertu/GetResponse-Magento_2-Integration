@@ -1,7 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
-use GetResponse\GetResponseIntegration\Model\Automation;
+use GetResponse\GetResponseIntegration\Model\Automation as ModelAutomation;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -23,7 +23,7 @@ class AutomationPost extends Action
     private $storeId;
 
     /**
-     * @var Automation
+     * @var ModelAutomation
      */
     private $automation;
 
