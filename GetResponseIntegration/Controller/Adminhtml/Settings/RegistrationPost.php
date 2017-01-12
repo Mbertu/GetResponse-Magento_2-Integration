@@ -1,7 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Controller\Adminhtml\Settings;
 
-use GetResponse\GetResponseIntegration\Model\Customs;
+use GetResponse\GetResponseIntegration\Model\Customs as ModelCustoms;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
@@ -103,7 +103,7 @@ class RegistrationPost extends Action
     public function updateCustoms($customs)
     {
         if (is_array($customs)) {
-            /** @var Customs $model */
+            /** @var ModelCustoms $model */
             $model = $this->_objectManager->create('GetResponse\GetResponseIntegration\Model\Customs');
             $all_customs = $model->getCollection()->addFieldToFilter('default', false);
             foreach ($all_customs as $custom) {
