@@ -2,6 +2,8 @@
 namespace GetResponse\GetResponseIntegration\Observer;
 
 use GetResponse\GetResponseIntegration\Block\Settings;
+use GetResponse\GetResponseIntegration\Helper\ApiHelper;
+use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\ObjectManagerInterface;
@@ -16,6 +18,9 @@ class SubscribeFromRegister implements ObserverInterface
      * @var ObjectManagerInterface
      */
     protected $_objectManager;
+
+    /** @var GetResponseAPI3 */
+    public $grApi;
 
     /**
      * SubscribeFromRegister constructor.
@@ -37,6 +42,8 @@ class SubscribeFromRegister implements ObserverInterface
         /** @var Settings $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $settings = $block->getSettings();
+        $this->grApi = $block->getClient();
+        $apiHelper = new ApiHelper($this->grApi);
 
         if ($settings['active_subscription'] != true) {
             return $this;
@@ -47,6 +54,7 @@ class SubscribeFromRegister implements ObserverInterface
         $subscriber->loadByEmail($customer->getEmail());
 
         if ($subscriber->isSubscribed() == true) {
+
             $params = [];
             $params['campaign'] = ['campaignId' => $settings['campaign_id']];
             $params['name'] = $customer->getFirstname() . ' ' . $customer->getLastname();
@@ -56,7 +64,8 @@ class SubscribeFromRegister implements ObserverInterface
                 $params['dayOfCycle'] = (int)$settings['cycle_day'];
             }
 
-            $block->getClient()->addContact($params);
+            $params['customFieldValues'] = $apiHelper->setCustoms(array('origin' => 'magento2'));
+            $this->grApi->addContact($params);
         }
 
         return $this;

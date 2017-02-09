@@ -1,6 +1,7 @@
 <?php
 namespace GetResponse\GetResponseIntegration\Observer;
 
+use GetResponse\GetResponseIntegration\Helper\ApiHelper;
 use GetResponse\GetResponseIntegration\Helper\GetResponseAPI3;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
@@ -17,10 +18,11 @@ class SubscribeFromOrder implements ObserverInterface
      */
     protected $_objectManager;
 
-    protected $all_custom_fields;
-
     /** @var GetResponseAPI3 */
     public $grApi;
+
+    /** @var ApiHelper */
+    private $apiHelper;
 
     /**
      * Constructor
@@ -42,6 +44,8 @@ class SubscribeFromOrder implements ObserverInterface
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $settings = $block->getSettings();
         $automations = $block->getAutomations();
+        $this->grApi = $block->getClient();
+        $this->apiHelper = new ApiHelper($this->grApi);
 
         if ($settings['active_subscription'] != true) {
             return $this;
@@ -87,9 +91,6 @@ class SubscribeFromOrder implements ObserverInterface
         $subscriber->loadByEmail($customer->getEmail());
 
         if ($subscriber->isSubscribed() == true) {
-            $this->grApi = $block->getClient();
-
-            $this->all_custom_fields = $this->getCustomFields();
 
             $move_subscriber = false;
 
@@ -160,6 +161,7 @@ class SubscribeFromOrder implements ObserverInterface
     public function addContact($campaign, $firstname, $lastname, $email, $cycle_day = 0, $user_customs = [])
     {
         $name = trim($firstname) . ' ' . trim($lastname);
+        $user_customs['origin'] = 'magento2';
 
         $params = [
             'name'       => $name,
@@ -185,104 +187,14 @@ class SubscribeFromOrder implements ObserverInterface
         if (!empty($contact) && isset($contact->contactId)) {
             $results = $this->grApi->getContact($contact->contactId);
             if (!empty($results->customFieldValues)) {
-                $params['customFieldValues'] = $this->mergeUserCustoms($results->customFieldValues, $user_customs);
+                $params['customFieldValues'] = $this->apiHelper->mergeUserCustoms($results->customFieldValues, $user_customs);
             } else {
-                $params['customFieldValues'] = $this->setCustoms($user_customs);
+                $params['customFieldValues'] = $this->apiHelper->setCustoms($user_customs);
             }
             return $this->grApi->updateContact($contact->contactId, $params);
         } else {
-            $params['customFieldValues'] = $this->setCustoms($user_customs);
+            $params['customFieldValues'] = $this->apiHelper->setCustoms($user_customs);
             return $this->grApi->addContact($params);
         }
     }
-
-    /**
-     * Merge user custom fields selected on WP admin site with those from gr account
-     * @param $results
-     * @param $user_customs
-     *
-     * @return array
-     */
-    public function mergeUserCustoms($results, $user_customs)
-    {
-        $custom_fields = [];
-
-        if (is_array($results)) {
-            foreach ($results as $customs) {
-                $value = $customs->value;
-                if (in_array($customs->name, array_keys($user_customs))) {
-                    $value = [$user_customs[$customs->name]];
-                    unset($user_customs[$customs->name]);
-                }
-
-                $custom_fields[] = [
-                    'customFieldId' => $customs->customFieldId,
-                    'value'         => $value
-                ];
-            }
-        }
-
-        return array_merge($custom_fields, $this->setCustoms($user_customs));
-    }
-
-    /**
-     * Set user custom fields
-     * @param $user_customs
-     *
-     * @return array
-     */
-    public function setCustoms($user_customs)
-    {
-        $custom_fields = [];
-
-        if (empty($user_customs)) {
-            return $custom_fields;
-        }
-
-        foreach ($user_customs as $name => $value) {
-            // if custom field is already created on gr account set new value
-            if (in_array($name, array_keys($this->all_custom_fields))) {
-                $custom_fields[] = [
-                    'customFieldId' => $this->all_custom_fields[$name],
-                    'value'         => [$value]
-                ];
-            } else {
-                $custom = $this->grApi->addCustomField([
-                    'name'   => $name,
-                    'type'   => "text",
-                    'hidden' => "false",
-                    'values' => [$value],
-                ]);
-
-                if (!empty($custom) && !empty($custom->customFieldId)) {
-                    $custom_fields[] = [
-                        'customFieldId' => $custom->customFieldId,
-                        'value'         => [$value]
-                    ];
-                }
-            }
-        }
-
-        return $custom_fields;
-    }
-
-    /**
-     * Get all user custom fields from gr account
-     * @return array
-     */
-    public function getCustomFields()
-    {
-        $all_customs = [];
-        $results     = $this->grApi->getCustomFields();
-        if (!empty($results)) {
-            foreach ($results as $ac) {
-                if (isset($ac->name) && isset($ac->customFieldId)) {
-                    $all_customs[$ac->name] = $ac->customFieldId;
-                }
-            }
-        }
-
-        return $all_customs;
-    }
-
 }
