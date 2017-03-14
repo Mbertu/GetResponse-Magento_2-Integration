@@ -84,6 +84,10 @@ class Settings extends Template
         $settings = $this->getSettings();
         $forms = [];
 
+        if (!isset($settings['api_key'])) {
+            return $forms;
+        }
+
         $client = new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
 
         $newForms = $client->getForms(['query' => ['status' => 'enabled']]);
@@ -206,6 +210,9 @@ class Settings extends Template
     public function getClient()
     {
         $settings = $this->getSettings();
-        return new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
+
+        if (isset($settings['api_key'])) {
+            return new GetResponseAPI3($settings['api_key'], $settings['api_url'], $settings['api_domain']);
+        }
     }
 }

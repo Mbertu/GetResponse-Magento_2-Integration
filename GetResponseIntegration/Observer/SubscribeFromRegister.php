@@ -42,7 +42,17 @@ class SubscribeFromRegister implements ObserverInterface
         /** @var Settings $block */
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $settings = $block->getSettings();
+
+        if (!isset($settings['api_key'])) {
+            return $this;
+        }
+
         $this->grApi = $block->getClient();
+
+        if (empty($this->grApi)) {
+            return $this;
+        }
+
         $apiHelper = new ApiHelper($this->grApi);
 
         if ($settings['active_subscription'] != true) {

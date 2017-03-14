@@ -44,7 +44,13 @@ class SubscribeFromOrder implements ObserverInterface
         $block = $this->_objectManager->create('GetResponse\GetResponseIntegration\Block\Settings');
         $settings = $block->getSettings();
         $automations = $block->getAutomations();
+
         $this->grApi = $block->getClient();
+
+        if (empty($this->grApi)) {
+            return $this;
+        }
+
         $this->apiHelper = new ApiHelper($this->grApi);
 
         if ($settings['active_subscription'] != true) {

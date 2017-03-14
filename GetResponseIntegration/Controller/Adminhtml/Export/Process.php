@@ -80,6 +80,11 @@ class Process extends Action
         // only those that are subscribed to newsletters
         $customers = $block->getCustomers();
         $this->grApi = $block->getClient();
+
+        if (empty($this->grApi)) {
+            return;
+        }
+
         $this->apiHelper = new ApiHelper($this->grApi);
 
         foreach ($customers as $customer) {
